@@ -1,0 +1,410 @@
+/* =========================================
+   1. VARIABLES & RESET
+   ========================================= */
+:root {
+  --primary-orange: #E9663C;  /* Sunset Orange */
+  --orange-dark: #C2410C;
+  --text-dark: #1c1917;       /* Charcoal */
+  --text-gray: #57534e;       /* Muted Text */
+  --text-light: #a8a29e;      /* Light Text */
+  --bg-cream: #FCF9F6;        /* Premium Background */
+  --white: #FFFFFF;
+}
+
+/* =========================================
+   2. NAVIGATION (Local Header Styles)
+   ========================================= */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 40px;
+  z-index: 100;
+  background: rgba(252, 249, 246, 0.85); /* Matches cream bg */
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.nav-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: var(--primary-orange);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  font-size: 24px;
+  font-style: italic;
+  border-radius: 4px;
+}
+
+.brand {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--text-dark);
+}
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-gray);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active-link {
+  color: var(--primary-orange);
+}
+
+.nav-cta button {
+  background: var(--text-dark);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-cta button:hover {
+  background: var(--primary-orange);
+  transform: translateY(-2px);
+}
+
+/* =========================================
+   3. SEARCH PAGE LAYOUT
+   ========================================= */
+.search-container-modern {
+  min-height: 100vh;
+  background-color: var(--bg-cream);
+  padding: 140px 32px 80px; /* Top padding clears fixed header */
+}
+
+/* Hero Text */
+.search-hero-section {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 50px;
+}
+
+.search-hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 56px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.search-hero-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  color: var(--text-gray);
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* =========================================
+   4. SEARCH BAR (Floating Pill Design)
+   ========================================= */
+.search-bar-section {
+  max-width: 800px;
+  margin: 0 auto 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.search-form {
+  background: white;
+  padding: 8px;
+  border-radius: 100px; /* Pill shape */
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-form:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 50px -10px rgba(233, 102, 60, 0.15);
+  border-color: rgba(233, 102, 60, 0.3);
+}
+
+.search-input-wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.search-icon {
+  margin-left: 24px;
+  color: #9CA3AF;
+  width: 20px;
+  height: 20px;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 16px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  color: var(--text-dark);
+  outline: none;
+}
+
+.search-button {
+  background-color: var(--primary-orange);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 100px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 4px;
+}
+
+.search-button:hover {
+  background-color: var(--orange-dark);
+  box-shadow: 0 4px 12px rgba(233, 102, 60, 0.3);
+}
+
+/* Filters */
+.filters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0 10px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: white;
+  border: 1px solid #E5E7EB;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.filter-btn:hover {
+  border-color: var(--primary-orange);
+  color: var(--primary-orange);
+}
+
+.filter-btn.active {
+  background-color: var(--primary-orange);
+  color: white;
+  border-color: var(--primary-orange);
+}
+
+/* =========================================
+   5. RESULTS GRID ("David Park" Style)
+   ========================================= */
+.search-results-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.results-header {
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 15px;
+}
+
+.results-count {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.count-number {
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+/* Card Container */
+.result-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  cursor: pointer;
+}
+
+.result-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Image Section */
+.card-image-wrapper {
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  position: relative;
+}
+
+.result-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.result-card:hover .result-image {
+  transform: scale(1.08);
+}
+
+/* Info Section (White Box) */
+.result-info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Name Row */
+.name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.result-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-dark);
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Verified Badge */
+.verified-badge-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #D97706; /* Gold/Orange */
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(217, 119, 6, 0.1);
+  padding: 4px 8px;
+  border-radius: 100px;
+}
+
+.verified-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Role & Meta */
+.result-role {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: var(--text-gray);
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.result-meta {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  color: var(--text-light);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+/* =========================================
+   6. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .site-nav { padding: 16px; }
+  .nav-links { display: none; }
+  
+  .search-container-modern {
+    padding: 100px 16px 60px;
+  }
+  
+  .search-hero-title { font-size: 40px; }
+  
+  .filters-row { justify-content: flex-start; }
+  .filter-group.ml-auto { margin-left: 0; width: 100%; }
+  
+  .results-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  }
+}
