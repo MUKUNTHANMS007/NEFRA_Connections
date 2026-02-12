@@ -37,7 +37,7 @@ main {
   flex: 1;
 }
 
-/* NAV */
+/* --- NAVIGATION --- */
 .site-nav {
   position: fixed;
   inset: 0 auto auto 0;
@@ -123,6 +123,7 @@ main {
   gap: 12px;
 }
 
+/* --- BUTTONS --- */
 .btn {
   border: 0;
   padding: 12px 22px;
@@ -170,12 +171,7 @@ main {
   background: rgba(234, 88, 12, 0.05);
 }
 
-.btn-cta {
-  padding: 14px 36px;
-  font-size: 12px;
-}
-
-/* HERO */
+/* --- HERO SECTION --- */
 .hero {
   position: relative;
   min-height: 100vh;
@@ -250,11 +246,6 @@ main {
   flex-wrap: wrap;
 }
 
-.hero-actions .btn {
-  padding: 14px 28px;
-  font-size: 12px;
-}
-
 .scroll-indicator {
   position: absolute;
   bottom: 28px;
@@ -264,13 +255,6 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-}
-
-.scroll-indicator span {
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 .scroll-line {
@@ -293,21 +277,12 @@ main {
 }
 
 @keyframes pulseVertical {
-  0% {
-    transform: translateY(-120%);
-    opacity: 0;
-  }
-  50% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(120%);
-    opacity: 0;
-  }
+  0% { transform: translateY(-120%); opacity: 0; }
+  50% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(120%); opacity: 0; }
 }
 
-/* CARDS */
+/* --- CONNECTION CARDS --- */
 .connection-card {
   background: #fff;
   border: 1px solid var(--card-border);
@@ -324,9 +299,7 @@ main {
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
 }
 
-.connection-card.large {
-  width: 100%;
-}
+.connection-card.large { width: 100%; }
 
 .connection-image {
   position: relative;
@@ -359,19 +332,10 @@ main {
   gap: 6px;
   font-weight: 800;
   color: var(--primary);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
   font-size: 10px;
 }
 
-.icon-check {
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-}
-
-.connection-body {
-  padding: 18px;
-}
+.connection-body { padding: 18px; }
 
 .connection-name {
   font-family: 'Cormorant Garamond', serif;
@@ -400,10 +364,6 @@ main {
   text-transform: uppercase;
 }
 
-.meta-sep {
-  opacity: 0.4;
-}
-
 .connection-card.side-left,
 .connection-card.side-right {
   position: absolute;
@@ -414,98 +374,44 @@ main {
   display: none;
 }
 
-.connection-card.side-left {
-  left: 48px;
-}
+.connection-card.side-left { left: 48px; }
+.connection-card.side-right { right: 48px; }
 
-.connection-card.side-right {
-  right: 48px;
-}
-
-/* SECTIONS */
+/* --- SECTIONS --- */
 .recent-activity {
   padding: 60px 0;
   background: #fff;
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
-  box-shadow: inset 0 30px 60px rgba(0, 0, 0, 0.02);
 }
 
 .section-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 20px;
-  margin-bottom: 36px;
-  padding: 0 32px;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.section-head.center {
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.eyebrow {
-  display: block;
-  font-size: 11px;
-  color: var(--primary);
-  font-weight: 900;
-  letter-spacing: 0.32em;
-  margin-bottom: 8px;
-  text-transform: uppercase;
+  margin: 0 auto 36px;
+  padding: 0 32px;
 }
 
 .section-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 2.6rem;
   margin: 0;
-  font-weight: 400;
-}
-
-.section-title em {
-  font-style: italic;
-  color: var(--muted);
-  font-weight: 300;
-}
-
-.view-all {
-  color: var(--primary);
-  font-weight: 900;
-  text-decoration: none;
-  border-bottom: 2px solid var(--primary);
-  padding-bottom: 6px;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition: opacity 0.3s;
-  white-space: nowrap;
-}
-
-.view-all:hover {
-  opacity: 0.7;
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 22px;
-  align-items: start;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 32px;
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+.sidebar { display: flex; flex-direction: column; gap: 20px; }
 
-/* STORIES */
+/* --- SUCCESS STORIES --- */
 .success-stories {
   padding: 56px 0;
   background: #F5F5F4;
@@ -520,25 +426,11 @@ main {
   padding: 0 32px;
 }
 
-.story-card {
-  background: transparent;
-}
-
 .story-image {
   border-radius: 16px;
   overflow: hidden;
   height: 340px;
   margin-bottom: 18px;
-}
-
-.story-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.story-body {
-  padding: 0 8px;
 }
 
 .story-metric {
@@ -549,38 +441,13 @@ main {
   border-radius: 999px;
   font-weight: 900;
   font-size: 11px;
-  margin-bottom: 12px;
-  text-transform: uppercase;
 }
 
-.story-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.8rem;
-  margin: 6px 0;
-  font-weight: 400;
-  line-height: 1.3;
-}
-
-.story-outcome {
-  color: var(--muted);
-  margin-bottom: 14px;
-  line-height: 1.6;
-  font-size: 14px;
-}
-
-.story-author {
-  font-weight: 800;
-  color: #6b6b6b;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* GLOBAL CTA */
+/* --- GLOBAL CTA (FIXED COLOR) --- */
 .global-cta {
   position: relative;
   padding: 64px 0;
-  background: var(--fg);
+  background: var(--fg); /* Dark Background */
   color: #fff;
   overflow: hidden;
 }
@@ -603,7 +470,6 @@ main {
   text-align: center;
   max-width: 920px;
   margin: 0 auto;
-  padding: 0 20px;
 }
 
 .cta-title {
@@ -612,19 +478,19 @@ main {
   margin: 0 0 28px;
   font-weight: 400;
   line-height: 1.2;
+  color: #ffffff; /* FORCED WHITE */
 }
 
 .cta-title span {
-  color: var(--primary);
+  color: var(--primary); /* "Awaits" in Orange */
   font-style: italic;
 }
 
-/* ANIMATIONS */
+/* --- ANIMATIONS --- */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.8s cubic-bezier(0.2, 1, 0.2, 1);
-  will-change: transform, opacity;
 }
 
 .reveal.active {
@@ -632,45 +498,12 @@ main {
   transform: none;
 }
 
-/* RESPONSIVE */
+/* --- RESPONSIVE --- */
 @media (min-width: 768px) {
-  .nav-links {
-    display: flex;
-  }
-
-  .hero-title {
-    font-size: 5rem;
-  }
-
-  .hero-subtitle {
-    font-size: 3.4rem;
-  }
-
-  .grid {
-    grid-template-columns: 2fr 1fr;
-    gap: 36px;
-  }
-
-  .stories-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .connection-card.side-left,
-  .connection-card.side-right {
-    display: block;
-  }
-
-  .cta-title {
-    font-size: 5.2rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .hero-title {
-    font-size: 6.5rem;
-  }
-
-  .hero-subtitle {
-    font-size: 4.2rem;
-  }
+  .nav-links { display: flex; }
+  .hero-title { font-size: 5rem; }
+  .grid { grid-template-columns: 2fr 1fr; gap: 36px; }
+  .stories-grid { grid-template-columns: repeat(3, 1fr); }
+  .connection-card.side-left, .connection-card.side-right { display: block; }
+  .cta-title { font-size: 5.2rem; }
 }

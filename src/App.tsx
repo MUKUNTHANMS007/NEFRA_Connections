@@ -4,70 +4,6 @@ import Search from './components/Search';
 import Company from './components/Company';
 import Profile from './components/Profile';
 
-// --- DATA CONSTANTS (NEFRA / PSG Context) ---
-const FEATURED_CONNECTIONS = [
-  {
-    id: 'conn_1',
-    name: 'Arjun Mehta',
-    role: 'Alumni Founder',
-    company: 'AgriTech Solutions',
-    industry: 'AgriTech',
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80",
-    alt: 'Professional woman in business attire', 
-    verified: true
-  },
-  {
-    id: 'conn_2',
-    name: 'Dr. Suresh Kumar',
-    role: 'Angel Investor',
-    company: 'PSG Alumni Network',
-    industry: 'Deep Tech',
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=800&q=80",
-    alt: 'Businessman in suit',
-    verified: true
-  },
-  {
-    id: 'conn_3',
-    name: 'Divya R.',
-    role: 'Student Innovator',
-    company: 'BioMed Systems',
-    industry: 'Healthcare',
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&q=80",
-    alt: 'Young woman smiling',
-    verified: false
-  }
-];
-
-const SUCCESS_STORIES = [
-  {
-    id: 'story_1',
-    title: 'SIH Hackathon Victory',
-    outcome: 'Connected with technical mentors via NEFRA and won the National Smart India Hackathon.',
-    metric: 'Won ₹1 Lakh',
-    image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=800&q=80",
-    author: 'Team Spark',
-    company: 'PSG iTech'
-  },
-  {
-    id: 'story_2',
-    title: 'Pre-Incubation Grant',
-    outcome: 'Met an alumni investor here. Secured pre-seed funding for our final year project prototype.',
-    metric: 'Seed Funded',
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
-    author: 'Karthik S.',
-    company: 'RoboDynamics'
-  },
-  {
-    id: 'story_3',
-    title: 'Global Mentorship',
-    outcome: 'Gained advisory support from Silicon Valley alumni to scale our SaaS platform globally.',
-    metric: 'Global Expansion',
-    image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80",
-    author: 'Priya Menon',
-    company: 'CloudFlow'
-  }
-];
-
 // --- ICON ---
 const CheckIcon = ({ className = '' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -75,11 +11,12 @@ const CheckIcon = ({ className = '' }: { className?: string }) => (
   </svg>
 );
 
-// --- COMPONENTS ---
+// --- COMPONENTS (Layout Unchanged) ---
 const ConnectionCard = ({ data, size = 'small', side }: { data: any, size?: 'large' | 'small', side?: 'left' | 'right' }) => (
   <article className={`connection-card ${size === 'large' ? 'large' : 'small'} ${side ? `side-${side}` : ''} reveal`}>
     <div className="connection-image">
-      <img src={data.image} alt={data.alt} loading="lazy" />
+      {/* Replaced .image with .imageUrl to match backend */}
+      <img src={data.imageUrl} alt={data.name} loading="lazy" />
       {data.verified && (
         <div className="verified-badge">
           <CheckIcon className="icon-check" />
@@ -93,9 +30,10 @@ const ConnectionCard = ({ data, size = 'small', side }: { data: any, size?: 'lar
       <p className="connection-role">{data.role}</p>
 
       <div className="connection-meta">
-        <span>{data.company}</span>
+        {/* Replaced string with nested object name from backend */}
+        <span>{data.company?.name || data.company}</span>
         <span className="meta-sep">•</span>
-        <span>{data.industry}</span>
+        <span>{data.industry?.name || data.industry}</span>
       </div>
     </div>
   </article>
@@ -104,7 +42,8 @@ const ConnectionCard = ({ data, size = 'small', side }: { data: any, size?: 'lar
 const SuccessStoryCard = ({ data }: { data: any }) => (
   <article className="story-card reveal">
     <div className="story-image">
-      <img src={data.image} alt={data.title} loading="lazy" />
+      {/* Replaced .image with .imageUrl to match backend */}
+      <img src={data.imageUrl} alt={data.title} loading="lazy" />
     </div>
 
     <div className="story-body">
@@ -135,15 +74,34 @@ function usePath() {
 export default function App() {
   const [path, navigate] = usePath();
 
+  // --- ADDED STATE FOR BACKEND DATA ---
+  const [featuredConnections, setConnections] = useState<any[]>([]);
+  const [successStories, setStories] = useState<any[]>([]);
+
+  // --- ADDED FETCH LOGIC ---
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [connRes, storyRes] = await Promise.all([
+          fetch('http://localhost:8081/api/users/featured'),
+          fetch('http://localhost:8081/api/stories/featured')
+        ]);
+        if (connRes.ok) setConnections(await connRes.json());
+        if (storyRes.ok) setStories(await storyRes.json());
+      } catch (err) {
+        console.error("Backend offline on 8081.");
+      }
+    };
+    loadData();
+  }, []);
+
   // --- FIXED ANIMATION OBSERVER ---
   useEffect(() => {
-    // 1. Create Observer
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add('active');
-            // Optional: Unobserve after animating to save performance
             observer.unobserve(e.target);
           }
         });
@@ -151,81 +109,41 @@ export default function App() {
       { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     );
 
-    // 2. Add slight delay to allow DOM painting
     const timer = setTimeout(() => {
       const hiddenElements = document.querySelectorAll('.reveal');
       hiddenElements.forEach((el) => observer.observe(el));
     }, 100);
 
-    // 3. Cleanup
     return () => {
       observer.disconnect();
       clearTimeout(timer);
     };
-  }, [path]); // <--- Dependency on 'path' ensures it runs on navigation
+  }, [path, featuredConnections, successStories]); // Runs when path changes OR data loads
 
   // Render other pages
-  if (path === '/search') {
-    return <Search />;
-  }
-  if (path === '/company') {
-    return <Company />;
-  }
-  if (path === '/profile') {
-    return <Profile />;
-  }
+  if (path === '/search') return <Search />;
+  if (path === '/company') return <Company />;
+  if (path === '/profile') return <Profile />;
 
   // Home page (default)
   return (
     <div className="app-root">
       <header className="site-nav">
         <div className="nav-inner">
-          <button 
-            className="nav-brand"
-            onClick={() => navigate('/')}
-          >
+          <button className="nav-brand" onClick={() => navigate('/')}>
             <div className="logo">N</div>
             <div className="brand">NEFRA Connections</div>
           </button>
 
           <nav className="nav-links">
-            <a 
-              href="/" 
-              onClick={(e) => { e.preventDefault(); navigate('/'); }}
-              className={path === '/' ? 'active-link' : ''}
-            >
-              Home
-            </a>
-            <a 
-              href="/search" 
-              onClick={(e) => { e.preventDefault(); navigate('/search'); }}
-              className={path === '/search' ? 'active-link' : ''}
-            >
-              Find Investors
-            </a>
-            <a 
-              href="/company" 
-              onClick={(e) => { e.preventDefault(); navigate('/company'); }}
-              className={path === '/company' ? 'active-link' : ''}
-            >
-              Startups
-            </a>
-            <a 
-              href="/profile" 
-              onClick={(e) => { e.preventDefault(); navigate('/profile'); }}
-              className={path === '/profile' ? 'active-link' : ''}
-            >
-              My Profile
-            </a>
+            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className={path === '/' ? 'active-link' : ''}>Home</a>
+            <a href="/search" onClick={(e) => { e.preventDefault(); navigate('/search'); }}>Find Investors</a>
+            <a href="/company" onClick={(e) => { e.preventDefault(); navigate('/company'); }}>Startups</a>
+            <a href="/profile" onClick={(e) => { e.preventDefault(); navigate('/profile'); }}>My Profile</a>
           </nav>
 
           <div className="nav-cta">
-            <button 
-              className="btn btn-dark"
-              onClick={() => navigate('/search')}
-            >
-              + Pitch Idea
-            </button>
+            <button className="btn btn-dark" onClick={() => navigate('/search')}>+ Pitch Idea</button>
           </div>
         </div>
       </header>
@@ -234,9 +152,13 @@ export default function App() {
         <section className="hero">
           <div className="hero-watermark">NEFRA</div>
 
-          {/* Note: side="left" and side="right" cards are absolute positioned */}
-          <ConnectionCard data={FEATURED_CONNECTIONS[0]} side="left" />
-          <ConnectionCard data={FEATURED_CONNECTIONS[1]} side="right" />
+          {/* Logic for floating cards using backend state */}
+          {featuredConnections.length >= 2 && (
+            <>
+              <ConnectionCard data={featuredConnections[0]} side="left" />
+              <ConnectionCard data={featuredConnections[1]} side="right" />
+            </>
+          )}
 
           <div className="hero-inner">
             <span className="hero-tag">Est. 2026</span>
@@ -245,18 +167,8 @@ export default function App() {
             <p className="hero-lead">The official ecosystem for PSG iTech entrepreneurs. Connect with alumni investors, find mentors, and turn your final year project into a funded startup.</p>
 
             <div className="hero-actions">
-              <button 
-                className="btn btn-primary"
-                onClick={() => navigate('/search')}
-              >
-                + Start Connecting
-              </button>
-              <button 
-                className="btn btn-outline"
-                onClick={() => navigate('/search')}
-              >
-                Explore Registry
-              </button>
+              <button className="btn btn-primary" onClick={() => navigate('/search')}>+ Start Connecting</button>
+              <button className="btn btn-outline" onClick={() => navigate('/search')}>Explore Registry</button>
             </div>
           </div>
 
@@ -272,23 +184,19 @@ export default function App() {
               <span className="eyebrow">Campus Activity</span>
               <h2 className="section-title">Recent <em>Matches</em></h2>
             </div>
-            <a 
-              className="view-all" 
-              href="/search"
-              onClick={(e) => { e.preventDefault(); navigate('/search'); }}
-            >
-              View Registry →
-            </a>
+            <a className="view-all" href="/search" onClick={(e) => { e.preventDefault(); navigate('/search'); }}>View Registry →</a>
           </div>
 
           <div className="grid">
             <div className="feature reveal">
-              <ConnectionCard data={FEATURED_CONNECTIONS[0]} size="large" />
+              {featuredConnections.length > 0 && <ConnectionCard data={featuredConnections[0]} size="large" />}
             </div>
 
             <aside className="sidebar reveal" style={{ transitionDelay: '0.15s' }}>
-              <ConnectionCard data={FEATURED_CONNECTIONS[1]} />
-              <ConnectionCard data={FEATURED_CONNECTIONS[2]} />
+              {/* Map remaining featured connections to sidebar */}
+              {featuredConnections.slice(1, 3).map((conn: any) => (
+                <ConnectionCard key={conn.id} data={conn} />
+              ))}
             </aside>
           </div>
         </section>
@@ -300,7 +208,7 @@ export default function App() {
           </div>
 
           <div className="stories-grid">
-            {SUCCESS_STORIES.map((s, i) => (
+            {successStories.map((s, i) => (
               <div key={s.id} style={{ transitionDelay: `${i * 0.08}s` }} className="reveal">
                 <SuccessStoryCard data={s} />
               </div>
@@ -312,12 +220,7 @@ export default function App() {
           <div className="cta-watermark">INVEST</div>
           <div className="cta-inner reveal">
             <h2 className="cta-title">Your Next Co-Founder<br /><span>Awaits</span></h2>
-            <button 
-              className="btn btn-primary btn-cta"
-              onClick={() => navigate('/search')}
-            >
-              Join NEFRA Network
-            </button>
+            <button className="btn btn-primary btn-cta" onClick={() => navigate('/search')}>Join NEFRA Network</button>
           </div>
         </section>
       </main>
