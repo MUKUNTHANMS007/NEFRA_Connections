@@ -3,6 +3,9 @@ import './App.css';
 import Search from './components/Search';
 import Company from './components/Company';
 import Profile from './components/Profile';
+import SignInPage from './pages/SignInPage';
+import SignUpPage from './pages/SignUpPage';
+import { motion } from 'framer-motion';
 
 // 1. IMPORT YOUR LOGO HERE
 import logoImg from './assets/NEFRA_Connections_LOGO.jpg';
@@ -77,6 +80,33 @@ export default function App() {
   const [featuredConnections, setConnections] = useState<any[]>([]);
   const [successStories, setStories] = useState<any[]>([]);
 
+  const foundersSpotlight = [
+    {
+      id: 'elon',
+      name: 'Elon Musk',
+      role: 'Entrepreneur / Engineer',
+      title: 'Tesla • SpaceX • Neuralink',
+      bio: "Studied at Queen's University and the University of Pennsylvania (Physics & Economics). Elon translated technical training and early startup exits (Zip2, PayPal) into multi‑industry companies — pioneering reusable rockets and mainstream electric vehicles. His path shows how campus research, cross‑discipline learning, and relentless product iteration scale into global platforms.",
+      highlights: [
+        'B.A./B.S. — University of Pennsylvania (Physics & Economics)',
+        'Co‑founded Zip2 and X.com (PayPal)',
+        'Founded SpaceX (rockets) and led Tesla (EVs) to mass market'
+      ]
+    },
+    {
+      id: 'jensen',
+      name: 'Jensen Huang',
+      role: 'Engineer • CEO',
+      title: 'Co‑founder & CEO, NVIDIA',
+      bio: "Earned an electrical engineering degree at Oregon State and an M.S. from Stanford. Jensen co‑founded NVIDIA in 1993 and guided GPUs from graphics accelerators to the foundation of modern AI — an excellent example of campus research being productized into industry‑defining technology.",
+      highlights: [
+        'BSEE — Oregon State University; MS — Stanford University',
+        'Co‑founded NVIDIA (1993)',
+        'Led GPUs → AI platforms used by universities and enterprises worldwide'
+      ]
+    }
+  ];
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -120,6 +150,8 @@ export default function App() {
   if (path === '/search') return <Search />;
   if (path === '/company') return <Company />;
   if (path === '/profile') return <Profile />;
+  if (path === '/signin') return <SignInPage />;
+  if (path === '/signup') return <SignUpPage />;
 
   return (
     <div className="app-root">
@@ -139,6 +171,8 @@ export default function App() {
           </nav>
 
           <div className="nav-cta">
+            <button className="btn btn-primary" onClick={() => navigate('/signup')}>Sign Up</button>
+            <button className="btn" onClick={() => navigate('/signin')}>Sign In</button>
             <button className="btn btn-dark" onClick={() => navigate('/search')}>+ Pitch Idea</button>
           </div>
         </div>
@@ -199,6 +233,46 @@ export default function App() {
           <div className="section-head center reveal">
             <span className="eyebrow">From Campus to Corporate</span>
             <h2 className="section-title">Real Ideas, <em>Real Funding</em></h2>
+          </div>
+
+          {/* --- FOUNDER SPOTLIGHT (Elon Musk + Jensen Huang) --- */}
+          <div className="founder-spotlight reveal">
+            <div className="founder-spotlight-grid">
+              {foundersSpotlight.map((f, i) => (
+                <motion.div
+                  key={f.id}
+                  className={`founder-card founder-card--${f.id}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  whileHover={{ scale: 1.03, translateY: -6, rotate: i === 0 ? -0.6 : 0.6 }}
+                  transition={{ duration: 0.45, ease: [0.2, 1, 0.2, 1] }}
+                >
+                  <div className="founder-avatar" aria-hidden>
+                    <div className="initials">{f.name.split(' ').map(n => n[0]).slice(0,2).join('')}</div>
+                    <div className="avatar-glow" />
+                  </div>
+
+                  <div className="founder-body">
+                    <div className="founder-header">
+                      <h3 className="founder-name">{f.name}</h3>
+                      <div className="founder-title">{f.title}</div>
+                    </div>
+
+                    <p className="founder-bio">{f.bio}</p>
+
+                    <ul className="founder-highlights">
+                      {f.highlights.map((h) => <li key={h}>{h}</li>)}
+                    </ul>
+
+                    <div className="founder-actions">
+                      <button className="btn btn-outline" onClick={() => window.open(`https://en.wikipedia.org/wiki/${encodeURIComponent(f.name.replace(' ', '_'))}`, '_blank')}>Learn more</button>
+                      <button className="btn btn-primary" onClick={() => navigate('/search')}>Find campus talent</button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
 
           <div className="stories-grid">

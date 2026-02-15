@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './Search.css';
+import logoImg from '../assets/NEFRA_Connections_LOGO.jpg';
 
 interface SearchResult {
   id: number;
@@ -135,7 +136,7 @@ function Search() {
       <header className="site-nav">
         <div className="nav-inner">
           <button className="nav-brand" onClick={() => navigate('/')}>
-            <div className="logo">N</div>
+            <img src={logoImg} alt="NEFRA Logo" className="site-logo-img" />
             <div className="brand">NEFRA Connections</div>
           </button>
           <nav className="nav-links">

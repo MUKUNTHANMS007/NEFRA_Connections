@@ -57,7 +57,12 @@ export default function SignIn() {
             <div className="input-group">
               <label>Email Address</label>
               <div className="input-wrapper">
-                <span className="input-icon">✉</span>
+                <span className="input-icon" aria-hidden>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 8.5v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M21 8.5l-9 5.5L3 8.5" />
+                  </svg>
+                </span>
                 <input type="email" placeholder="your.email@example.com" required />
               </div>
             </div>
@@ -65,7 +70,12 @@ export default function SignIn() {
             <div className="input-group">
               <label>Password</label>
               <div className="input-wrapper">
-                <span className="input-icon">🔒</span>
+                <span className="input-icon" aria-hidden>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="11" width="18" height="10" rx="2" />
+                    <path d="M7 11V8a5 5 0 0 1 10 0v3" />
+                  </svg>
+                </span>
                 <input 
                   type={showPassword ? "text" : "password"} 
                   placeholder="Enter your password" 
@@ -74,9 +84,11 @@ export default function SignIn() {
                 <button 
                   type="button" 
                   className="toggle-password"
+                  aria-pressed={showPassword}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>

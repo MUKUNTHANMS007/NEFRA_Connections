@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import './Company.css';
+import logoImg from '../assets/NEFRA_Connections_LOGO.jpg';
 
 type CompanyTab = 'about' | 'team' | 'metrics';
 
@@ -133,7 +134,7 @@ function Company() {
             className="nav-brand"
             onClick={() => navigate('/')}
           >
-            <div className="logo">N</div>
+            <img src={logoImg} alt="NEFRA Logo" className="site-logo-img" />
             <div className="brand">NEFRA Connections</div>
           </button>
 
