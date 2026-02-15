@@ -1,15 +1,15 @@
-<<<<<<< HEAD
+HEAD
 # NEFRA_Connections 🚀
 =======
-<<<<<<< HEAD
+HEAD
 # NEFRA_Connections
->>>>>>> 33bd874 (Add files via upload)
+
 
 NEFRA_Connections is a professional networking platform designed to connect **Entrepreneurs** and **Investors**. This project demonstrates a full-stack architecture using **React** for the frontend and **Spring Boot** for the backend.
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 ### **Frontend**
 * **Framework**: React 18 with TypeScript
@@ -25,7 +25,7 @@ NEFRA_Connections is a professional networking platform designed to connect **En
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### **1. Backend (Spring Boot)**
 * Open the backend folder in **IntelliJ IDEA**.
