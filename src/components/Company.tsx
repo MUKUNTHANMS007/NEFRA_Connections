@@ -27,13 +27,26 @@ function Company() {
   const companyData = {
     name: 'TechVentures',
     tagline: 'Building the future of fintech',
-    cover: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80',
-    logo: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=300&q=80',
+    cover: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1600&q=80',
+    logo: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80',
     verified: true,
     founded: '2020',
     location: 'San Francisco, CA',
     website: 'www.techventures.io',
     industry: 'Fintech',
+    // Enhanced metadata for UI
+    stage: 'Series B',
+    valuation: '$120M',
+    raised: '$45M',
+    traction: 82, // percent
+    techStack: ['React', 'TypeScript', 'Node.js', 'Python', 'Postgres', 'Kubernetes'],
+    investors: ['Sequoia', 'a16z', 'Greylock'],
+    roadmap: [
+      { id: 1, title: 'MVP Launch', date: 'Q1 2021', desc: 'Validated product‑market fit' },
+      { id: 2, title: 'Series A', date: 'Q3 2021', desc: 'Scaled to 100+ clients' },
+      { id: 3, title: 'APAC Expansion', date: 'Q2 2022', desc: 'Established Singapore HQ' },
+      { id: 4, title: 'Series B', date: 'Q4 2023', desc: 'AI‑first platform' }
+    ]
   };
 
   const stats = [
@@ -186,28 +199,34 @@ function Company() {
         <img src={companyData.cover} alt="Company cover" />
       </div>
 
-      {/* Header Card */}
+      {/* Header Card (upgraded) */}
       <div className="company-header-card">
         <div className="company-header-content">
-          {/* Logo Section */}
+          {/* Logo + Stage */}
           <div className="company-logo-section">
-            <img 
-              src={companyData.logo} 
-              alt={companyData.name}
-              className="company-logo"
-            />
+            <img src={companyData.logo} alt={companyData.name} className="company-logo" />
             {companyData.verified && (
               <div className="verified-badge-company">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
                 </svg>
               </div>
             )}
+
+            <div className="stage-ribbon">{companyData.stage}</div>
           </div>
 
           {/* Company Info */}
           <div className="company-info">
-            <h1 className="company-name-modern">{companyData.name}</h1>
+            <div className="company-meta-row" style={{ display: 'flex', gap: 16, alignItems: 'baseline', justifyContent: 'space-between' }}>
+              <h1 className="company-name-modern">{companyData.name}</h1>
+
+              <div className="valuation-badge" aria-hidden>
+                <div className="valuation-amount">{companyData.valuation}</div>
+                <div className="valuation-label">Valuation</div>
+              </div>
+            </div>
+
             <p className="company-tagline">{companyData.tagline}</p>
 
             {/* Company Details Grid */}
@@ -231,36 +250,37 @@ function Company() {
                 </a>
               </div>
             </div>
+
+            <div className="tech-stack" aria-hidden>
+              {companyData.techStack.map((t) => <span key={t} className="tech-chip">{t}</span>)}
+            </div>
           </div>
 
           {/* Actions */}
           <div className="company-actions-modern">
-            <motion.button
-              className="btn-action btn-follow"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              + Follow
-            </motion.button>
-            <motion.button
-              className="btn-action btn-message"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Contact
-            </motion.button>
-            <motion.button
-              className="btn-action btn-more"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              ...
-            </motion.button>
+            <motion.button className="btn-action btn-follow" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>+ Follow</motion.button>
+            <motion.button className="btn-action btn-message" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>Request Intro</motion.button>
+            <motion.button className="btn-action btn-apply" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} onClick={() => navigate('/signin')}>Apply to Pitch</motion.button>
+          </div>
+        </div>
+
+        <div className="header-foot">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="traction-meter" role="progressbar" aria-valuenow={companyData.traction} aria-valuemin={0} aria-valuemax={100}>
+              <div className="meter-fill" style={{ width: `${companyData.traction}%` }} />
+            </div>
+            <div className="traction-label">Product adoption <strong>{companyData.traction}%</strong></div>
+          </div>
+
+          <div className="investor-list" aria-hidden>
+            {companyData.investors.map((inv) => (
+              <div key={inv} className="investor-badge" title={inv}>{inv[0]}</div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Stats Section */}
+      {/* Stats Section (enhanced) */}
       <div className="company-stats-section">
         <div className="stats-grid">
           {stats.map((stat, index) => (
@@ -269,13 +289,31 @@ function Company() {
               className="stat-card-company"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
+              transition={{ duration: 0.35, delay: index * 0.08 }}
               whileHover={{ y: -4 }}
             >
               <div className="stat-value-company">{stat.value}</div>
               <div className="stat-label-company">{stat.label}</div>
+
+              <div className="stat-progress" style={{ marginTop: 10 }}>
+                <div style={{ height: 6, borderRadius: 999, background: '#f3f3f3', overflow: 'hidden' }}>
+                  <div style={{ width: `${(index + 1) * 20}%`, height: '100%', background: 'linear-gradient(90deg,#F97316,#60A5FA)' }} />
+                </div>
+              </div>
             </motion.div>
           ))}
+        </div>
+
+        <div className="tech-investors reveal" style={{ marginTop: 18 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 20, alignItems: 'center' }}>
+            <div className="tech-stack small">
+              {companyData.techStack.map((t) => <span key={t} className="tech-chip">{t}</span>)}
+            </div>
+
+            <div className="investor-logos">
+              {companyData.investors.map((inv) => <div key={inv} className="investor-badge">{inv[0]}</div>)}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -375,6 +413,32 @@ function Company() {
                 ))}
               </div>
             </motion.div>
+
+            {/* Roadmap (new) */}
+            <motion.div
+              className="roadmap-section"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.45 }}
+            >
+              <h3 className="section-title-company">Roadmap</h3>
+              <div className="roadmap">
+                {companyData.roadmap.map((r, idx) => (
+                  <motion.div key={r.id} className="roadmap-step"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.08 * idx }}
+                  >
+                    <div className="step-dot" />
+                    <div className="step-body">
+                      <div className="step-title">{r.title}</div>
+                      <div className="step-date">{r.date}</div>
+                      <p className="step-desc">{r.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -399,7 +463,17 @@ function Company() {
                 >
                   <div className="team-member-image">
                     <img src={member.image} alt={member.name} />
+
+                    <div className="team-member-social" aria-hidden>
+                      <a className="social-btn" href="#" title={`Message ${member.name}`} onClick={(e) => e.preventDefault()}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+                      </a>
+                      <a className="social-btn" href="#" title={`LinkedIn ${member.name}`} onClick={(e) => e.preventDefault()}>
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM0 8h5v16H0zM7.5 8h4.7v2.2h.1c.7-1.3 2.4-2.2 4-2.2 4.3 0 5.2 2.8 5.2 6.4V24H17v-8.6c0-2.1 0-4.8-3-4.8-3 0-3 2-3 4.6V24H7.5V8z"/></svg>
+                      </a>
+                    </div>
                   </div>
+
                   <div className="team-member-info">
                     <h4 className="team-member-name">{member.name}</h4>
                     <p className="team-member-title">{member.title}</p>

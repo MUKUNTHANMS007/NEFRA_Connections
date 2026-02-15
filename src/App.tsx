@@ -5,7 +5,7 @@ import Company from './components/Company';
 import Profile from './components/Profile';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // 1. IMPORT YOUR LOGO HERE
 import logoImg from './assets/NEFRA_Connections_LOGO.jpg';
@@ -84,6 +84,7 @@ export default function App() {
     {
       id: 'elon',
       name: 'Elon Musk',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Elon_Musk_Royal_Society_%28cropped%29.jpg',
       role: 'Entrepreneur / Engineer',
       title: 'Tesla • SpaceX • Neuralink',
       bio: "Studied at Queen's University and the University of Pennsylvania (Physics & Economics). Elon translated technical training and early startup exits (Zip2, PayPal) into multi‑industry companies — pioneering reusable rockets and mainstream electric vehicles. His path shows how campus research, cross‑discipline learning, and relentless product iteration scale into global platforms.",
@@ -96,6 +97,7 @@ export default function App() {
     {
       id: 'jensen',
       name: 'Jensen Huang',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/0/05/JensenHuangSC18.jpg',
       role: 'Engineer • CEO',
       title: 'Co‑founder & CEO, NVIDIA',
       bio: "Earned an electrical engineering degree at Oregon State and an M.S. from Stanford. Jensen co‑founded NVIDIA in 1993 and guided GPUs from graphics accelerators to the foundation of modern AI — an excellent example of campus research being productized into industry‑defining technology.",
@@ -137,8 +139,12 @@ export default function App() {
     );
 
     const timer = setTimeout(() => {
-      const hiddenElements = document.querySelectorAll('.reveal');
-      hiddenElements.forEach((el) => observer.observe(el));
+      const hiddenElements = Array.from(document.querySelectorAll('.reveal')) as HTMLElement[];
+      hiddenElements.forEach((el, idx) => {
+        // apply a small stagger so items reveal in sequence when the route changes
+        el.style.transitionDelay = `${idx * 60}ms`;
+        observer.observe(el);
+      });
     }, 100);
 
     return () => {
@@ -147,11 +153,45 @@ export default function App() {
     };
   }, [path, featuredConnections, successStories]);
 
-  if (path === '/search') return <Search />;
-  if (path === '/company') return <Company />;
-  if (path === '/profile') return <Profile />;
-  if (path === '/signin') return <SignInPage />;
-  if (path === '/signup') return <SignUpPage />;
+  if (path === '/search') return (
+    <AnimatePresence mode="wait">
+      <motion.div key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35 }}>
+        <Search />
+      </motion.div>
+    </AnimatePresence>
+  );
+
+  if (path === '/company') return (
+    <AnimatePresence mode="wait">
+      <motion.div key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35 }}>
+        <Company />
+      </motion.div>
+    </AnimatePresence>
+  );
+
+  if (path === '/profile') return (
+    <AnimatePresence mode="wait">
+      <motion.div key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35 }}>
+        <Profile />
+      </motion.div>
+    </AnimatePresence>
+  );
+
+  if (path === '/signin') return (
+    <AnimatePresence mode="wait">
+      <motion.div key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35 }}>
+        <SignInPage />
+      </motion.div>
+    </AnimatePresence>
+  );
+
+  if (path === '/signup') return (
+    <AnimatePresence mode="wait">
+      <motion.div key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35 }}>
+        <SignUpPage />
+      </motion.div>
+    </AnimatePresence>
+  );
 
   return (
     <div className="app-root">
@@ -246,11 +286,20 @@ export default function App() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.2 }}
                   whileHover={{ scale: 1.03, translateY: -6, rotate: i === 0 ? -0.6 : 0.6 }}
-                  transition={{ duration: 0.45, ease: [0.2, 1, 0.2, 1] }}
+                  transition={{ duration: 0.45, ease: [0.2, 1, 0.2, 1], delay: i * 0.08 }}
                 >
                   <div className="founder-avatar" aria-hidden>
-                    <div className="initials">{f.name.split(' ').map(n => n[0]).slice(0,2).join('')}</div>
-                    <div className="avatar-glow" />
+                    {f.image ? (
+                      <>
+                        <img src={f.image} alt={`${f.name} portrait`} className="founder-photo" loading="lazy" />
+                        <div className="avatar-glow" />
+                      </>
+                    ) : (
+                      <>
+                        <div className="initials">{f.name.split(' ').map(n => n[0]).slice(0,2).join('')}</div>
+                        <div className="avatar-glow" />
+                      </>
+                    )}
                   </div>
 
                   <div className="founder-body">
