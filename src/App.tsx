@@ -5,6 +5,7 @@ import Company from './components/Company';
 import Profile from './components/Profile';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
+import SettingsPage from './pages/SettingsPage';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // 1. IMPORT YOUR LOGO HERE
@@ -193,6 +194,14 @@ export default function App() {
     </AnimatePresence>
   );
 
+  if (path === '/settings') return (
+    <AnimatePresence mode="wait">
+      <motion.div key={path} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35 }}>
+        <SettingsPage />
+      </motion.div>
+    </AnimatePresence>
+  );
+
   return (
     <div className="app-root">
       <header className="site-nav">
@@ -208,6 +217,7 @@ export default function App() {
             <a href="/search" onClick={(e) => { e.preventDefault(); navigate('/search'); }}>Find Investors</a>
             <a href="/company" onClick={(e) => { e.preventDefault(); navigate('/company'); }}>Startups</a>
             <a href="/profile" onClick={(e) => { e.preventDefault(); navigate('/profile'); }}>My Profile</a>
+            <a href="/settings" onClick={(e) => { e.preventDefault(); navigate('/settings'); }}>Settings</a>
           </nav>
 
           <div className="nav-cta">

@@ -24,6 +24,24 @@ function Company() {
   const [activeTab, setActiveTab] = useState<CompanyTab>('about');
   const [path, navigate] = usePath(); // Added navigation hook
 
+  // local UI state for careers modal
+  const [applyFor, setApplyFor] = useState<string | null>(null);
+  const [applicantName, setApplicantName] = useState('');
+  const [applicantEmail, setApplicantEmail] = useState('');
+  const [applyStatus, setApplyStatus] = useState<'idle' | 'sent' | 'error'>('idle');
+
+  const submitApplication = (e: React.FormEvent) => {
+    e.preventDefault();
+    setApplyStatus('sent');
+    console.log('Application submitted', { role: applyFor, name: applicantName, email: applicantEmail });
+    setTimeout(() => {
+      setApplicantName('');
+      setApplicantEmail('');
+      setApplyFor(null);
+      setApplyStatus('idle');
+    }, 900);
+  };
+
   const companyData = {
     name: 'TechVentures',
     tagline: 'Building the future of fintech',
@@ -60,21 +78,25 @@ function Company() {
     {
       label: 'System Uptime',
       value: '99.9%',
+      percent: 99,
       description: 'Industry-leading reliability'
     },
     {
       label: 'Client Satisfaction',
       value: '4.8/5',
+      percent: 96,
       description: 'Based on 500+ reviews'
     },
     {
       label: 'AI Models',
       value: '150+',
+      percent: 84,
       description: 'Advanced algorithms'
     },
     {
       label: 'Revenue Growth',
       value: '+180%',
+      percent: 74,
       description: 'Year-over-year'
     }
   ];
@@ -99,6 +121,13 @@ function Company() {
       icon: '📈'
     }
   ];
+
+  const caseStudies = [
+    { id: 'c1', title: 'From MVP to 10K users', summary: 'Helped scale to 10k MAUs in 6 months via product partnerships.', image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80' },
+    { id: 'c2', title: 'Enterprise adoption', summary: 'Secured 3 enterprise pilots including Fortune 500 clients.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80' }
+  ];
+
+  const [copySuccess, setCopySuccess] = useState(false);
 
   const teamMembers = [
     {
@@ -129,6 +158,13 @@ function Company() {
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
       bio: 'Product innovation leader and design advocate'
     }
+  ];
+
+  // --- NEW: Open roles (careers)
+  const openRoles = [
+    { id: 'r1', title: 'Senior Full‑Stack Engineer', location: 'Remote / SF', level: 'Senior', tags: ['React', 'Node.js', 'K8s'] },
+    { id: 'r2', title: 'Product Designer', location: 'Remote', level: 'Mid', tags: ['Figma', 'UX'] },
+    { id: 'r3', title: 'Machine Learning Engineer', location: 'San Francisco', level: 'Senior', tags: ['PyTorch', 'MLOps'] }
   ];
 
   const aboutContent = {
@@ -180,6 +216,7 @@ function Company() {
             >
               My Profile
             </a>
+            <a href="/settings" onClick={(e) => { e.preventDefault(); navigate('/settings'); }}>Settings</a>
           </nav>
 
           <div className="nav-cta">
@@ -261,6 +298,7 @@ function Company() {
             <motion.button className="btn-action btn-follow" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>+ Follow</motion.button>
             <motion.button className="btn-action btn-message" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>Request Intro</motion.button>
             <motion.button className="btn-action btn-apply" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }} onClick={() => navigate('/signin')}>Apply to Pitch</motion.button>
+            <button className="btn-action btn-outline" onClick={() => { navigator.clipboard.writeText(window.location.href); alert('Company URL copied to clipboard'); }}>Share</button>
           </div>
         </div>
 
@@ -439,6 +477,44 @@ function Company() {
                 ))}
               </div>
             </motion.div>
+
+            {/* Case studies */}
+            <motion.div className="about-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+              <h3 className="section-title-company">Case studies</h3>
+              <div className="case-studies" style={{ marginTop: 12 }}>
+                {caseStudies.map(c => (
+                  <div key={c.id} className="case-card">
+                    <img src={c.image} alt={c.title} />
+                    <div style={{ padding: 12 }}>
+                      <div className="case-title">{c.title}</div>
+                      <div className="case-summary">{c.summary}</div>
+                      <div style={{ marginTop: 8 }}>
+                        <button className="btn btn-outline" onClick={() => alert('Open case study (demo)')}>Read story</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Open roles (new) */}
+            <motion.div className="about-card" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+              <h3 className="section-title-company">Open roles</h3>
+              <div className="jobs-grid" style={{ marginTop: 12 }}>
+                {openRoles.map((job) => (
+                  <div key={job.id} className="job-card">
+                    <div>
+                      <div className="job-title">{job.title}</div>
+                      <div className="job-meta">{job.level} • {job.location}</div>
+                      <div className="job-tags">{job.tags.map(t => <span key={t} className="tech-chip">{t}</span>)}</div>
+                    </div>
+                    <div>
+                      <button className="btn btn-primary" onClick={() => { setApplyFor(job.id); setApplicantName(''); setApplicantEmail(''); }}>Apply</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -504,6 +580,10 @@ function Company() {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                   whileHover={{ y: -4 }}
                 >
+                  <div className="metric-ring" style={{ background: `conic-gradient(#60A5FA ${metric.percent}%, #eef2ff 0)` }}>
+                    <div className="inner">{metric.percent}%</div>
+                  </div>
+
                   <div className="metric-value">{metric.value}</div>
                   <div className="metric-label">{metric.label}</div>
                   <p className="metric-description">{metric.description}</p>
@@ -513,6 +593,25 @@ function Company() {
           </motion.div>
         )}
       </motion.div>
+
+      {/* Application modal (simple) */}
+      {applyFor && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="apply-modal">
+            <h3>Apply for role</h3>
+            <p className="muted">Role: <strong>{openRoles.find(r => r.id === applyFor)?.title}</strong></p>
+
+            <form onSubmit={submitApplication} style={{ display: 'grid', gap: 8 }}>
+              <input required placeholder="Full name" value={applicantName} onChange={e => setApplicantName(e.target.value)} />
+              <input required placeholder="Email" type="email" value={applicantEmail} onChange={e => setApplicantEmail(e.target.value)} />
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 6 }}>
+                <button type="button" className="btn btn-outline" onClick={() => setApplyFor(null)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">{applyStatus === 'sent' ? 'Sent' : 'Send application'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

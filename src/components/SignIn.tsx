@@ -107,13 +107,19 @@ export default function SignIn() {
             </div>
 
             <div className="social-auth">
-              <button type="button" className="social-btn">
-                <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="Google" />
-                Google
+              <button type="button" className="social-btn social-btn--google" aria-label="Sign in with Google">
+                <span className="social-icon" aria-hidden>
+                  {/* google glyph */}
+                  <svg width="18" height="18" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" role="img"><path fill="#4285F4" d="M533.5 278.4c0-17.4-1.6-34-4.6-50.2H272v95.1h147.1c-6.4 34.6-25.6 63.9-54.6 83.5v69.6h88.2c51.6-47.5 81.8-117.6 81.8-198z"/><path fill="#34A853" d="M272 544.3c73.7 0 135.6-24.5 180.8-66.7l-88.2-69.6c-24.6 16.5-56.1 26.1-92.6 26.1-71 0-131.3-47.9-152.8-112.3H28.6v70.7C73.5 486.9 167.6 544.3 272 544.3z"/><path fill="#FBBC05" d="M119.2 326.1c-10.9-32.7-10.9-67.7 0-100.4V155c-45.5 27.1-75.9 74.3-75.9 129.1s30.4 102 75.9 129.1v-87.1z"/><path fill="#EA4335" d="M272 107.7c38.9 0 74 13.4 101.5 39l76.1-76.1C407.6 24.2 345.7 0 272 0 167.6 0 73.5 57.4 28.6 144.9l90.6 70.8C140.7 155.6 201 107.7 272 107.7z"/></svg>
+                </span>
+                <span className="social-label">Continue with Google</span>
               </button>
-              <button type="button" className="social-btn">
-                <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" />
-                LinkedIn
+
+              <button type="button" className="social-btn social-btn--linkedin" aria-label="Sign in with LinkedIn">
+                <span className="social-icon" aria-hidden>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2" xmlns="http://www.w3.org/2000/svg" role="img"><path d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM0 8h5v16H0zM7.5 8h4.7v2.2h.1c.7-1.3 2.4-2.2 4-2.2 4.3 0 5.2 2.8 5.2 6.4V24H17v-8.6c0-2.1 0-4.8-3-4.8-3 0-3 2-3 4.6V24H7.5V8z"/></svg>
+                </span>
+                <span className="social-label">Sign in with LinkedIn</span>
               </button>
             </div>
 

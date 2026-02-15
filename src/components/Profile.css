@@ -210,6 +210,26 @@
     border-bottom: 1px solid var(--border-light);
   }
 
+  /* mutual connections */
+  .mutual-row { display:flex; align-items:center; gap:10px; margin-left: 12px; }
+  .mutual-avatars { display:flex; margin-right: 6px; }
+  .mutual-avatar { width:28px; height:28px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow: 0 6px 18px rgba(2,6,23,0.06); margin-left: -8px; }
+  .mutual-count { font-size:12px; color:var(--text-muted); font-weight:800; }
+
+  /* profile success cards */
+  .profile-success-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-top: 16px; }
+  .success-card { display:flex; gap:12px; background: linear-gradient(180deg,#fff,#fbfbff); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-light); box-shadow: 0 6px 20px rgba(2,6,23,0.04); }
+  .success-card img { width: 120px; height: 100%; object-fit: cover; display:block; }
+  .success-body { padding: 12px; display:flex; flex-direction:column; gap:6px; }
+  .success-title { font-weight:800; color:var(--text-dark); }
+  .success-excerpt { font-size:13px; color:var(--text-muted); }
+
+  /* intro modal */
+  .intro-modal { width: 100%; max-width: 640px; background: #fff; border-radius: 12px; padding: 18px; box-shadow: 0 30px 80px rgba(2,6,23,0.4); border: 1px solid #eef2ff; }
+  .muted { color: var(--text-muted); }
+
+  .share-btn { border: 1px dashed #e7e7e7; background: transparent; }
+
   .stat-item {
     display: flex;
     flex-direction: column;

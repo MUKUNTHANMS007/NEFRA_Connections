@@ -39,6 +39,26 @@ function Profile() {
     connections: '156',
   };
 
+  // mutual connections & quick success stories for the profile (UI only)
+  const mutualConnections = [
+    { id: 1, name: 'Marcus Rodriguez', avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80' },
+    { id: 2, name: 'Emily Zhang', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80' },
+    { id: 3, name: 'James Wilson', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80' },
+    { id: 4, name: 'David Park', avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80' }
+  ];
+
+  const profileSuccess = [
+    { id: 's1', title: 'Closed Series A in 3 months', excerpt: 'Connected with lead investor and closed a $5M round rapidly.', image: 'https://images.unsplash.com/photo-1528901166007-3784c7dd3653?auto=format&fit=crop&w=800&q=80' },
+    { id: 's2', title: 'Found the perfect co‑founder', excerpt: 'Matched with a technical co‑founder and launched the MVP.', image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80' }
+  ];
+
+  // UI state for sharing / intro modal
+  const [showIntroModal, setShowIntroModal] = useState(false);
+  const [introTarget, setIntroTarget] = useState('');
+  const [introMessage, setIntroMessage] = useState('');
+  const [introSent, setIntroSent] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
   const aboutContent = {
     bio: 'Passionate about building innovative solutions and connecting passionate people. I believe the best ideas deserve the right capital, and the best capital deserves the right ideas.',
     expertise: ['Fintech', 'AI/ML', 'SaaS', 'Blockchain', 'Web3'],
@@ -101,6 +121,7 @@ function Profile() {
             >
               My Profile
             </a>
+            <a href="/settings" onClick={(e) => { e.preventDefault(); navigate('/settings'); }}>Settings</a>
           </nav>
 
           <div className="nav-cta">
@@ -146,6 +167,13 @@ function Profile() {
                 <span className="stat-value">{profileData.connections}</span>
                 <span className="stat-label">Connections</span>
               </div>
+
+              <div className="mutual-row" aria-hidden>
+                <div className="mutual-avatars">
+                  {mutualConnections.map(m => <img key={m.id} src={m.avatar} alt={m.name} className="mutual-avatar" />)}
+                </div>
+                <div className="mutual-count">+34 mutual</div>
+              </div>
             </div>
 
             <div className="profile-actions-modern">
@@ -156,13 +184,21 @@ function Profile() {
               >
                 + Follow
               </motion.button>
+
               <motion.button 
                 className="btn-action btn-message" 
                 whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/signin')}
               >
                 Message
               </motion.button>
+
+              <motion.button className="btn-action btn-outline" whileHover={{ scale: 1.03 }} onClick={() => setShowIntroModal(true)}>Request Intro</motion.button>
+
+              <button className="btn-action share-btn" onClick={() => { navigator.clipboard.writeText(window.location.href); setShareCopied(true); setTimeout(() => setShareCopied(false), 1400); }}>
+                {shareCopied ? 'Copied' : 'Share'}
+              </button>
             </div>
           </div>
         </div>
@@ -214,6 +250,18 @@ function Profile() {
                   </a>
                 </div>
               </div>
+
+              <div className="profile-success-grid" style={{ marginTop: 20 }}>
+                {profileSuccess.map(s => (
+                  <div key={s.id} className="success-card">
+                    <img src={s.image} alt={s.title} />
+                    <div className="success-body">
+                      <div className="success-title">{s.title}</div>
+                      <div className="success-excerpt">{s.excerpt}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
@@ -253,6 +301,25 @@ function Profile() {
           </div>
         )}
       </motion.div>
+
+      {/* Request intro modal */}
+      {showIntroModal && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="intro-modal">
+            <h3>Request an introduction</h3>
+            <p className="muted">Quickly ask someone in your network to introduce you.</p>
+            <form onSubmit={(e) => { e.preventDefault(); setIntroSent(true); setTimeout(() => { setIntroSent(false); setShowIntroModal(false); setIntroMessage(''); setIntroTarget(''); }, 900); }} style={{ display: 'grid', gap: 8 }}>
+              <input value={introTarget} onChange={e => setIntroTarget(e.target.value)} placeholder="Introduce me to (name)" required />
+              <textarea value={introMessage} onChange={e => setIntroMessage(e.target.value)} placeholder="Short message to include" rows={4} />
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button type="button" className="btn btn-outline" onClick={() => setShowIntroModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">{introSent ? 'Sent' : 'Send request'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
