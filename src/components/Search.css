@@ -112,9 +112,9 @@
    ========================================= */
 .search-container-modern {
   min-height: 100vh;
-  background-color: var(--bg-cream);
+  background: linear-gradient(180deg, var(--vintage), var(--bg-cream));
   padding: 140px 32px 80px; /* Top padding clears fixed header */
-}
+} 
 
 /* Hero Text */
 .search-hero-section {

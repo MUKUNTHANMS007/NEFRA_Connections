@@ -106,10 +106,10 @@
 
   .profile-container-modern {
     min-height: 100vh;
-    background: linear-gradient(180deg, #FAFAFA 0%, #F5F5F5 100%);
+    background: linear-gradient(180deg, #FAFAFA 0%, var(--vintage) 55%);
     padding-bottom: 60px;
     padding-top: 85px; /* Added padding for fixed header */
-  }
+  } 
 
   /* COVER SECTION */
   .profile-cover {

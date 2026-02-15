@@ -7,6 +7,7 @@
   --muted: #78716c;
   --card-border: #e7e5e4;
   --safe-gray: #f5f5f5;
+  --vintage: #F3EFE6; /* subtle paper / warm beige */
 }
 
 * { 
@@ -197,6 +198,8 @@ main {
   background-position: center;
   background-attachment: fixed;
 }
+
+.hero::after{ content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(243,239,230,0.25), transparent); mix-blend-mode: multiply; }
 
 .hero-watermark {
   position: absolute;
@@ -461,11 +464,11 @@ main {
   align-items: flex-start;
   padding: 20px;
   border-radius: 18px;
-  background: linear-gradient(180deg, #ffffff, #fbfbfb);
+  background: linear-gradient(180deg, #ffffff, var(--vintage) 60%);
   border: 1px solid rgba(2,6,23,0.04);
   box-shadow: 0 10px 40px rgba(2,6,23,0.06);
   transition: transform 300ms cubic-bezier(0.2,1,0.2,1), box-shadow 300ms;
-}
+} 
 
 .founder-card:hover { transform: translateY(-10px); box-shadow: 0 20px 60px rgba(2,6,23,0.12); }
 
@@ -516,6 +519,8 @@ main {
 .founder-name { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; }
 .founder-title { color: var(--primary); font-weight: 800; font-size: 0.9rem; }
 .founder-bio { color: var(--muted); margin-top: 10px; line-height: 1.55; }
+.founder-attribution { margin-top: 8px; font-size: 12px; color: #9ca3af; }
+.founder-attribution a { color: inherit; text-decoration: underline; opacity: 0.95; }
 .founder-highlights { margin-top: 12px; color: #6b7280; display: flex; flex-direction: column; gap: 6px; padding-left: 14px; }
 .founder-highlights li { position: relative; list-style: none; padding-left: 10px; }
 .founder-highlights li:before { content: '•'; position: absolute; left: 0; color: var(--primary); font-weight: 900; }
@@ -601,6 +606,8 @@ main {
   opacity: 1;
   transform: none;
 }
+
+.paper-accent { background: linear-gradient(180deg,#fff, var(--vintage) 95%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
 
 /* --- RESPONSIVE --- */
 @media (min-width: 768px) {

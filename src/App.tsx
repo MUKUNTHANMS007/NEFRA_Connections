@@ -86,6 +86,7 @@ export default function App() {
       id: 'elon',
       name: 'Elon Musk',
       image: 'https://upload.wikimedia.org/wikipedia/commons/d/d8/Elon_Musk_Royal_Society_%28cropped%29.jpg',
+      attribution: { text: 'Royal Society — CC BY‑SA 4.0', href: 'https://commons.wikimedia.org/wiki/File:Elon_Musk_Royal_Society_(cropped).jpg' },
       role: 'Entrepreneur / Engineer',
       title: 'Tesla • SpaceX • Neuralink',
       bio: "Studied at Queen's University and the University of Pennsylvania (Physics & Economics). Elon translated technical training and early startup exits (Zip2, PayPal) into multi‑industry companies — pioneering reusable rockets and mainstream electric vehicles. His path shows how campus research, cross‑discipline learning, and relentless product iteration scale into global platforms.",
@@ -319,6 +320,12 @@ export default function App() {
                     </div>
 
                     <p className="founder-bio">{f.bio}</p>
+
+                    {f.attribution && (
+                      <div className="founder-attribution muted">
+                        Image: <a href={f.attribution.href} target="_blank" rel="noopener noreferrer">{f.attribution.text}</a>
+                      </div>
+                    )}
 
                     <ul className="founder-highlights">
                       {f.highlights.map((h) => <li key={h}>{h}</li>)}
