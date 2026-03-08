@@ -104,9 +104,10 @@ export default function Search() {
         
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((u) => (
-            <div
+            <Link
               key={String(u.id)}
-              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl"
+              to={`/profile/${u.id}`}
+              className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 transition-shadow hover:-translate-y-1 hover:border-slate-300 hover:shadow-md"
             >
               <div className="flex items-start gap-4">
                 <img
@@ -125,7 +126,7 @@ export default function Search() {
                   {subtitle(u) && <p className="mt-1 text-sm text-slate-500">{subtitle(u)}</p>}
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

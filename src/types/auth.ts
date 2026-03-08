@@ -11,6 +11,9 @@ export type RoleEnum = 'ENTREPRENEUR' | 'INVESTOR';
 
 export interface RegisterRequestDTO {
   username: string;
+  email: string;
   password: string;
+  fullName: string;
   role: RoleEnum;
+  domainType: string;
 }

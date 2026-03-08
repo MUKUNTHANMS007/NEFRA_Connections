@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { AxiosResponse } from 'axios';
 import api from '../api';
 import type { AuthResponseDTO, RegisterRequestDTO, RoleEnum } from '../types/auth';
@@ -9,14 +9,24 @@ const ROLES: { value: RoleEnum; label: string }[] = [
   { value: 'INVESTOR', label: 'Investor' },
 ];
 
+const DOMAINS: { value: string; label: string }[] = [
+  { value: 'TECHNICAL', label: 'Technical' },
+  { value: 'FINANCIAL', label: 'Financial' },
+  { value: 'EDUCATIONAL', label: 'Educational' },
+  { value: 'AGRICULTURAL', label: 'Agricultural' },
+  { value: 'BIO_TECHNOLOGY', label: 'Bio-Technology' },
+  { value: 'OTHER', label: 'Other' },
+];
+
 export default function SignUp() {
   const navigate = useNavigate();
-  const [form, setForm] = useState<RegisterRequestDTO & { fullName?: string; company?: string; confirmPassword?: string }>({
+  const [form, setForm] = useState<RegisterRequestDTO & { confirmPassword?: string }>({
     username: '',
+    email: '',
     password: '',
-    role: 'ENTREPRENEUR',
     fullName: '',
-    company: '',
+    role: 'ENTREPRENEUR',
+    domainType: 'TECHNICAL',
     confirmPassword: '',
   });
   const [loading, setLoading] = useState(false);
@@ -31,25 +41,16 @@ export default function SignUp() {
     }
     setLoading(true);
     try {
-      const res: AxiosResponse<AuthResponseDTO> = await api.post('/auth/register', {
-        username: form.username,
-        password: form.password,
-        role: form.role,
-      });
-      const { userId, id, role } = res.data;
-      const userIdStr = userId != null ? String(userId) : (id != null ? String(id) : undefined);
-      if (userIdStr) localStorage.setItem('userId', userIdStr);
-      if (role) localStorage.setItem('role', role);
+      const { confirmPassword: _, ...payload } = form;
+      const res: AxiosResponse<AuthResponseDTO> = await api.post('/auth/register', payload);
+      const { id, role } = res.data;
+      if (id) localStorage.setItem('userId', String(id));
+      if (role) localStorage.setItem('userRole', role);
+      
       navigate('/profile');
-    } catch (err: unknown) {
-      const res = err && typeof err === 'object' && 'response' in err
-        ? (err as { response?: { status?: number; data?: unknown } }).response
-        : null;
-      const msg = res?.data && typeof res.data === 'object' && res.data !== null && 'message' in res.data
-        ? String((res.data as { message: unknown }).message)
-        : null;
-      if (res?.status === 400 || res?.status === 409) setError(msg ?? 'Invalid request or username already taken.');
-      else setError(msg ?? 'Server connection error.');
+    } catch (err: any) {
+      console.error("Signup error:", err);
+      setError(err.response?.data?.message ?? 'Server connection error.');
     } finally {
       setLoading(false);
     }
@@ -58,67 +59,83 @@ export default function SignUp() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <p className="text-center text-sm font-medium uppercase tracking-wider text-gray-500">Join</p>
-        <h1 className="mt-2 text-center text-3xl font-bold text-gray-900">Join NEFRA</h1>
-        <p className="mt-2 text-center text-gray-600">Create your account and start connecting</p>
-
+        <h1 className="text-center text-3xl font-bold text-gray-900">Join NEFRA</h1>
+        
         <form onSubmit={handleSubmit} className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+          {/* Full Name */}
           <label className="block text-sm font-medium text-gray-700">Full Name</label>
           <input
             type="text"
-            value={form.fullName ?? ''}
+            required
+            value={form.fullName}
             onChange={e => setForm({ ...form, fullName: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
             placeholder="Jane Doe"
           />
-          <label className="mt-4 block text-sm font-medium text-gray-700">Email / Username</label>
+
+          {/* Username */}
+          <label className="mt-4 block text-sm font-medium text-gray-700">Username</label>
           <input
             type="text"
+            required
             value={form.username}
             onChange={e => setForm({ ...form, username: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="you@example.com"
-            required
+            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
+            placeholder="janedoe123"
           />
+
+          {/* Email */}
+          <label className="mt-4 block text-sm font-medium text-gray-700">Email Address</label>
+          <input
+            type="email"
+            required
+            value={form.email}
+            onChange={e => setForm({ ...form, email: e.target.value })}
+            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
+            placeholder="jane@example.com"
+          />
+
+          {/* Domain Type */}
+          <label className="mt-4 block text-sm font-medium text-gray-700">Industry Domain</label>
+          <select
+            value={form.domainType}
+            onChange={e => setForm({ ...form, domainType: e.target.value })}
+            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
+          >
+            {DOMAINS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+          </select>
+
+          {/* Role */}
           <label className="mt-4 block text-sm font-medium text-gray-700">Role</label>
           <select
             value={form.role}
             onChange={e => setForm({ ...form, role: e.target.value as RoleEnum })}
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
           >
             {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
           </select>
-          <label className="mt-4 block text-sm font-medium text-gray-700">Company (optional)</label>
-          <input
-            type="text"
-            value={form.company ?? ''}
-            onChange={e => setForm({ ...form, company: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="Acme Inc"
-          />
+
+          {/* Passwords */}
           <label className="mt-4 block text-sm font-medium text-gray-700">Password</label>
           <input
             type="password"
+            required
             value={form.password}
             onChange={e => setForm({ ...form, password: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="••••••••"
-            required
+            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
           />
+
           <label className="mt-4 block text-sm font-medium text-gray-700">Confirm Password</label>
           <input
             type="password"
-            value={form.confirmPassword ?? ''}
-            onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="••••••••"
             required
+            value={form.confirmPassword}
+            onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
+            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
           />
-          <label className="mt-4 flex items-start gap-2 text-sm text-gray-600">
-            <input type="checkbox" className="mt-1 rounded border-gray-300" required />
-            I agree to the Terms of Service and Privacy Policy
-          </label>
+
           {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
           <button
             type="submit"
             disabled={loading}
@@ -126,15 +143,6 @@ export default function SignUp() {
           >
             {loading ? 'Creating account…' : 'Create Account'}
           </button>
-          <p className="mt-6 text-center text-sm text-gray-500">Or sign up with</p>
-          <div className="mt-4 flex justify-center gap-4">
-            <button type="button" className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">Google</button>
-            <button type="button" className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">LinkedIn</button>
-          </div>
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Already have an account?{' '}
-            <Link to="/signin" className="font-medium text-blue-600 hover:text-blue-500">Sign in</Link>
-          </p>
         </form>
       </div>
     </div>

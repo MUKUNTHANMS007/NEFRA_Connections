@@ -57,28 +57,30 @@ export default function Profile() {
                 Edit Profile
               </Link>
             </div>
-            <div className="flex gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
-                <CheckCircle className="h-4 w-4" />
-                Verified
-              </span>
-            </div>
+            {(user as { isVerified?: boolean }).isVerified && (
+              <div className="flex gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
+                  <CheckCircle className="h-4 w-4" />
+                  Verified
+                </span>
+              </div>
+            )}
           </div>
           <p className="mt-6 text-gray-600">
-            Building the future through meaningful connections. Open to collaboration and new opportunities.
+            {(user as { description?: string }).description ?? 'No bio added yet.'}
           </p>
           {/* Stats */}
           <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
             <div>
-              <p className="text-2xl font-bold text-blue-600">342</p>
-              <p className="text-sm text-gray-500">Connections</p>
+              <p className="text-2xl font-bold text-blue-600">{(user as { connectionCount?: number }).connectionCount ?? 0}</p>
+              <p className="text-sm text-gray-500">Following</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-600">28</p>
-              <p className="text-sm text-gray-500">Posts</p>
+              <p className="text-2xl font-bold text-blue-600">{(user as { postCount?: number }).postCount ?? 0}</p>
+              <p className="text-sm text-gray-500">Followers</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-600">2021</p>
+              <p className="text-2xl font-bold text-blue-600">{(user as { foundedYear?: string | number }).foundedYear ?? 'N/A'}</p>
               <p className="text-sm text-gray-500">Founded</p>
             </div>
             <div>
