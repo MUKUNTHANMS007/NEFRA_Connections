@@ -1,15 +1,24 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 import { CheckCircle, Users, Zap } from 'lucide-react';
+import api from '../api';
 
 export default function Homepage() {
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get('/posts/feed')
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setRecentPosts(data.slice(0, 3));
+      })
+      .catch(() => setRecentPosts([]));
+  }, []);
+
   const featured = [
     { name: 'Alex Thompson', role: 'Entrepreneur • Tech', verified: true, ref: 'Ref. 092 / 2026' },
     { name: 'Rachel Kim', role: 'Investor • Finance', verified: true, badge: 'Active Network', est: 'Est. 2026' },
-  ];
-  const recent = [
-    { name: 'Sarah Chen', title: 'Founder & CEO', company: 'TechVentures • Tech', verified: true },
-    { name: 'Marcus Rodriguez', title: 'Angel Investor', company: 'Venture Capital Group • Finance', verified: true },
-    { name: 'Emily Zhang', title: 'Co-Founder', company: 'HealthTech Solutions • Healthcare', verified: false },
   ];
   const stories = [
     { stat: 'Raised $5M', title: 'From Idea to Series A', desc: 'Connected with lead investor through NEFRA, closed $5M Series A round within 3 months.', author: 'David Park', tag: 'AI Analytics' },
@@ -33,7 +42,7 @@ export default function Homepage() {
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link
-                  to="/signup"
+                  to={localStorage.getItem('userId') ? '/search' : '/signup'}
                   className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-500"
                 >
                   <Zap className="h-5 w-5" />
@@ -85,16 +94,29 @@ export default function Homepage() {
             </Link>
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {recent.map((u, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900">{u.name}</h3>
-                  {u.verified && <CheckCircle className="h-4 w-4 text-green-600" />}
+            {recentPosts.length === 0 ? (
+              <p className="col-span-full text-center text-gray-500">No recent activity yet.</p>
+            ) : (
+              recentPosts.map((p: any, i: number) => (
+                <div key={p.id ?? i} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                  {p.authorName != null && (
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-gray-900">{p.authorName}</h3>
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    </div>
+                  )}
+                  <p className="mt-1 text-sm text-gray-600">{p.description ?? p.content ?? ''}</p>
+                  {p.imageUrl != null && p.imageUrl !== '' && (
+                    <img src={String(p.imageUrl)} alt="Post attachment" className="mt-3 rounded-lg object-cover max-h-48 w-full" />
+                  )}
+                  {p.createdAt != null && !isNaN(new Date(p.createdAt).getTime()) && (
+                    <p className="mt-2 text-xs text-gray-500">
+                      {formatDistanceToNow(new Date(p.createdAt), { addSuffix: true })}
+                    </p>
+                  )}
                 </div>
-                <p className="mt-1 text-sm text-gray-600">{u.title}</p>
-                <p className="text-sm text-gray-500">{u.company}</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -129,7 +151,7 @@ export default function Homepage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              to="/signup"
+              to={localStorage.getItem('userId') ? '/search' : '/signup'}
               className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-500"
             >
               <Users className="h-5 w-5" />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Edit3, FileText, Users, Settings, Zap } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { CheckCircle, Edit3, FileText, Trash2, Users, Settings, Zap } from 'lucide-react';
 import api from '../api';
 import type { ProfileUser } from '../types/user';
 
@@ -8,6 +9,7 @@ export default function Profile() {
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
 
   useEffect(() => {
     const storedId = localStorage.getItem('userId');
@@ -15,7 +17,6 @@ export default function Profile() {
       setLoading(false);
       return;
     }
-    // THE FIX IS HERE: Change /users/ to /profiles/
     api.get<ProfileUser>(`/profiles/${storedId}`)
       .then((res) => setUser(res.data))
       .catch((err: unknown) => {
@@ -23,6 +24,13 @@ export default function Profile() {
         setError(res?.status === 404 ? 'User not found.' : 'Server connection error.');
       })
       .finally(() => setLoading(false));
+
+    api.get('/posts/user/' + storedId)
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setRecentPosts(data.slice(0, 3));
+      })
+      .catch(() => setRecentPosts([]));
   }, []);
 
   if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p className="text-gray-600">Loading profile…</p></div>;
@@ -32,12 +40,6 @@ export default function Profile() {
   const fullName = user.fullName ?? user.full_name ?? user.username ?? 'User';
   const role = user.role ?? 'Member';
   const industry = (user as { industry?: string }).industry ?? 'Tech';
-
-  const activities = [
-    { title: 'Posted a success story', time: '2 days ago', desc: 'Shared how we closed our Series A round with strategic investors from the NEFRA community.' },
-    { title: 'Connected with Marcus Rodriguez', time: '5 days ago', desc: 'Established a new connection with Angel Investor at Venture Capital Group.' },
-    { title: 'Updated profile information', time: '1 week ago', desc: 'Added new role as Advisor to 3 early-stage startups in the AI space.' },
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -115,13 +117,49 @@ export default function Profile() {
         <div className="mt-10">
           <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
           <div className="mt-4 space-y-4">
-            {activities.map((a, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="font-medium text-gray-900">{a.title}</h3>
-                <p className="mt-1 text-sm text-gray-500">{a.time}</p>
-                <p className="mt-2 text-sm text-gray-600">{a.desc}</p>
+            {recentPosts.map((post: any, i: number) => (
+              <div key={post.id ?? i} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    {post.title != null && <h3 className="font-medium text-gray-900">{post.title}</h3>}
+                    <p className="mt-2 text-sm text-gray-600">{post.description ?? post.content ?? ''}</p>
+                    {post.imageUrl != null && post.imageUrl !== '' && (
+                      <img src={String(post.imageUrl)} alt="Post attachment" className="mt-4 rounded-lg object-cover max-h-96 w-full" />
+                    )}
+                    {post.createdAt != null && !isNaN(new Date(post.createdAt).getTime()) && (
+                      <p className="mt-1 text-sm text-gray-500">
+                        {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                      </p>
+                    )}
+                  </div>
+                  {String(post.userId) === localStorage.getItem('userId') && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await api.delete('/posts/' + post.id + '?userId=' + localStorage.getItem('userId'));
+                          setRecentPosts((prev) => prev.filter((p) => String(p.id) !== String(post.id)));
+                        } catch (e) {
+                          console.error('Failed to delete post', e);
+                        }
+                      }}
+                      className="shrink-0 rounded p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"
+                      aria-label="Delete post"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Link
+              to="/profile/posts"
+              className="inline-flex items-center justify-center rounded-lg border border-gray-300 px-6 py-3 font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Show More
+            </Link>
           </div>
         </div>
 

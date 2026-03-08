@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save } from 'lucide-react';
+import api from '../api';
 
 export default function Settings() {
   const [saved, setSaved] = useState(false);
@@ -23,10 +24,33 @@ export default function Settings() {
     eventInvitations: true,
   });
 
-  const handleSave = (e: React.FormEvent) => {
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+    api
+      .get(`/settings/${userId}`)
+      .then((res) => {
+        const data = res.data;
+        if (data && typeof data === 'object') {
+          setForm((f) => ({ ...f, ...data }));
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load settings', err);
+      });
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+    try {
+      await api.put(`/settings/${userId}`, form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error('Failed to save settings', err);
+    }
   };
 
   const toggle = (key: keyof typeof form, value: boolean) => {
