@@ -1,6 +1,6 @@
 @import "@fontsource-variable/geist";
-/* If you installed tw-animate-css as a normal CSS file, keep this here. */
-@import "tw-animate-css";
+/* If tw-animate-css is a local file, keep this. If it's a plugin, it should be in tailwind.config.js */
+@import "tw-animate-css"; 
 
 @tailwind base;
 @tailwind components;
@@ -29,6 +29,7 @@
     --radius: 0.75rem;
   }
 
+  /* Forced Dark Mode for NEFRA Dominance */
   .dark {
     --background: oklch(0.12 0 0);
     --foreground: oklch(0.985 0 0);

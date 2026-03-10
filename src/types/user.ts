@@ -18,5 +18,11 @@ export interface ProfileUser {
   email?: string;
   role?: string;
   location?: string;
+  /** Total number of connections this profile has */
+  connectionCount?: number;
+  /** Total number of posts this profile has authored */
+  postCount?: number;
+  /** Relationship between the viewing user and this profile */
+  connectionStatus?: 'SELF' | 'NONE' | 'PENDING' | 'PENDING_SENT' | 'PENDING_RECEIVED' | 'ACCEPTED';
   [key: string]: unknown;
 }

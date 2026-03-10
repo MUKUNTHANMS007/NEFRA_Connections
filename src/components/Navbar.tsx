@@ -24,7 +24,7 @@ export default function Navbar() {
   useEffect(() => {
     const uid = localStorage.getItem('userId');
     if (!uid) return;
-    api.get('/notifications/user/' + uid)
+    api.get(`/notifications/${uid}`)
       .then((res) => setNotifications(Array.isArray(res.data) ? res.data : []))
       .catch(() => setNotifications([]));
   }, [userId]);
@@ -41,6 +41,16 @@ export default function Navbar() {
 
   const isEntrepreneur = userRole === 'ENTREPRENEUR';
   const isInvestor = userRole === 'INVESTOR';
+
+  const handleNotificationClick = async (notification: any) => {
+    if (!notification?.id) return;
+    try {
+      await api.put(`/notifications/${notification.id}/read`);
+      setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+    } catch {
+      // ignore errors for now; keep UI responsive
+    }
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -94,7 +104,8 @@ export default function Navbar() {
                         notifications.slice(0, 5).map((n: any, i: number) => (
                           <div
                             key={n.id ?? i}
-                            className="border-b border-gray-100 px-4 py-3 last:border-b-0 hover:bg-gray-50"
+                            className="cursor-pointer border-b border-gray-100 px-4 py-3 last:border-b-0 hover:bg-gray-50"
+                            onClick={() => handleNotificationClick(n)}
                           >
                             <p className="text-sm text-gray-900">{n.message ?? n.content ?? n.text ?? 'Notification'}</p>
                             {n.createdAt && (

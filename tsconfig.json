@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"] // Keep this, it works with "moduleResolution": "bundler"
+      "@/*": ["./src/*"]
     },
     "composite": true,
     "target": "ESNext",
@@ -13,7 +13,13 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    
+    /* THE FIX */
+    "noEmit": false, 
+    "emitDeclarationOnly": true, 
+    "declaration": true,
+    "declarationMap": true,
+
     "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
