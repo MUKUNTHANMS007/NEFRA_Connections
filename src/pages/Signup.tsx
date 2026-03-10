@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import type { AxiosResponse } from 'axios';
 import api from '../api';
 import type { AuthResponseDTO, RegisterRequestDTO, RoleEnum } from '../types/auth';
@@ -57,92 +57,109 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <h1 className="text-center text-3xl font-bold text-gray-900">Join NEFRA</h1>
+    <div className="w-full flex min-h-[90vh] items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg">
+        <h1 className="text-center text-4xl font-black text-white tracking-tight">Join NEFRA</h1>
+        <p className="mt-3 text-center text-slate-400 font-medium">Establish a new node in the ecosystem</p>
         
-        <form onSubmit={handleSubmit} className="mt-10 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-          {/* Full Name */}
-          <label className="block text-sm font-medium text-gray-700">Full Name</label>
-          <input
-            type="text"
-            required
-            value={form.fullName}
-            onChange={e => setForm({ ...form, fullName: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
-            placeholder="Jane Doe"
-          />
+        <form onSubmit={handleSubmit} className="mt-10 rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-8 shadow-2xl ring-1 ring-white/5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Full Name</label>
+              <input
+                type="text"
+                required
+                value={form.fullName}
+                onChange={e => setForm({ ...form, fullName: e.target.value })}
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                placeholder="Jane Doe"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Username</label>
+              <input
+                type="text"
+                required
+                value={form.username}
+                onChange={e => setForm({ ...form, username: e.target.value })}
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                placeholder="janedoe123"
+              />
+            </div>
+          </div>
 
-          {/* Username */}
-          <label className="mt-4 block text-sm font-medium text-gray-700">Username</label>
-          <input
-            type="text"
-            required
-            value={form.username}
-            onChange={e => setForm({ ...form, username: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
-            placeholder="janedoe123"
-          />
-
-          {/* Email */}
-          <label className="mt-4 block text-sm font-medium text-gray-700">Email Address</label>
+          <label className="mt-5 block text-xs font-bold uppercase tracking-widest text-slate-400">Email Address</label>
           <input
             type="email"
             required
             value={form.email}
             onChange={e => setForm({ ...form, email: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
             placeholder="jane@example.com"
           />
 
-          {/* Domain Type */}
-          <label className="mt-4 block text-sm font-medium text-gray-700">Industry Domain</label>
-          <select
-            value={form.domainType}
-            onChange={e => setForm({ ...form, domainType: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
-          >
-            {DOMAINS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-          </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Industry Domain</label>
+              <select
+                value={form.domainType}
+                onChange={e => setForm({ ...form, domainType: e.target.value })}
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none"
+              >
+                {DOMAINS.map(d => <option key={d.value} value={d.value} className="bg-slate-900">{d.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Role</label>
+              <select
+                value={form.role}
+                onChange={e => setForm({ ...form, role: e.target.value as RoleEnum })}
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none"
+              >
+                {ROLES.map(r => <option key={r.value} value={r.value} className="bg-slate-900">{r.label}</option>)}
+              </select>
+            </div>
+          </div>
 
-          {/* Role */}
-          <label className="mt-4 block text-sm font-medium text-gray-700">Role</label>
-          <select
-            value={form.role}
-            onChange={e => setForm({ ...form, role: e.target.value as RoleEnum })}
-            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
-          >
-            {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-          </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Password</label>
+              <input
+                type="password"
+                required
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Confirm</label>
+              <input
+                type="password"
+                required
+                value={form.confirmPassword}
+                onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+              />
+            </div>
+          </div>
 
-          {/* Passwords */}
-          <label className="mt-4 block text-sm font-medium text-gray-700">Password</label>
-          <input
-            type="password"
-            required
-            value={form.password}
-            onChange={e => setForm({ ...form, password: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
-          />
-
-          <label className="mt-4 block text-sm font-medium text-gray-700">Confirm Password</label>
-          <input
-            type="password"
-            required
-            value={form.confirmPassword}
-            onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
-            className="mt-2 w-full rounded-lg border border-gray-300 p-3"
-          />
-
-          {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+          {error && <p className="mt-6 text-sm font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-6 w-full rounded-lg bg-blue-600 py-3 font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+            className="mt-8 w-full rounded-xl bg-blue-600 py-3.5 font-black tracking-widest uppercase text-white hover:bg-blue-500 disabled:opacity-50 transition-all hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
           >
-            {loading ? 'Creating account…' : 'Create Account'}
+            {loading ? 'Initializing Node…' : 'Establish Connection'}
           </button>
+          
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <p className="text-center text-sm font-medium text-slate-400">
+              Already in the system?{' '}
+              <Link to="/signin" className="font-bold text-blue-400 hover:text-blue-300">Login here</Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>

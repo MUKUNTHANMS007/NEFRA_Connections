@@ -1,6 +1,9 @@
-import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import GeometricBackgroundLayout from './components/GeometricBackground'; // The new wrapper
+
 import Homepage from './pages/Homepage';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/Signup';
@@ -16,28 +19,48 @@ import CompanyProfileView from './pages/CompanyProfileView';
 import Settings from './pages/Settings';
 
 export default function App() {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  // We store the routes in a single variable so React Router doesn't get confused
+  const pageRoutes = (
+    <Routes>
+      <Route path="/" element={<Homepage />} />
+      <Route path="/signin" element={<SignIn />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/login" element={<Navigate to="/signin" replace />} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/post" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+      <Route path="/company" element={<Company />} />
+      <Route path="/my-company" element={<ProtectedRoute><MyCompany /></ProtectedRoute>} />
+      <Route path="/my-company/edit" element={<ProtectedRoute><MyCompanyEdit /></ProtectedRoute>} />
+      <Route path="/explore-companies" element={<ExploreCompanies />} />
+      <Route path="/company_profile/:id" element={<CompanyProfileView />} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+    </Routes>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       <Navbar />
-      <main>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/login" element={<Navigate to="/signin" replace />} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/profile/:id" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/feed" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/post" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
-          <Route path="/company" element={<Company />} />
-          <Route path="/my-company" element={<ProtectedRoute><MyCompany /></ProtectedRoute>} />
-          <Route path="/my-company/edit" element={<ProtectedRoute><MyCompanyEdit /></ProtectedRoute>} />
-          <Route path="/explore-companies" element={<ExploreCompanies />} />
-          <Route path="/company_profile/:id" element={<CompanyProfileView />} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        </Routes>
-      </main>
+      
+      {/* Conditionally apply the NEFRA geometric background */}
+      {isHomePage ? (
+        <main className="flex-grow pb-28">
+          {pageRoutes}
+        </main>
+      ) : (
+        <main className="flex-grow">
+          <GeometricBackgroundLayout>
+            {pageRoutes}
+          </GeometricBackgroundLayout>
+        </main>
+      )}
+
+      <Footer />
       <Outlet />
     </div>
   );
