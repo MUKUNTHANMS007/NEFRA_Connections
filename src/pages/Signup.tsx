@@ -4,6 +4,9 @@ import type { AxiosResponse } from 'axios';
 import api from '../api';
 import type { AuthResponseDTO, RegisterRequestDTO, RoleEnum } from '../types/auth';
 
+// THE INJECTION: Importing your custom advanced password field
+import { PasswordField } from '@/components/ui/password-field';
+
 const ROLES: { value: RoleEnum; label: string }[] = [
   { value: 'ENTREPRENEUR', label: 'Entrepreneur' },
   { value: 'INVESTOR', label: 'Investor' },
@@ -71,7 +74,7 @@ export default function SignUp() {
                 required
                 value={form.fullName}
                 onChange={e => setForm({ ...form, fullName: e.target.value })}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none"
                 placeholder="Jane Doe"
               />
             </div>
@@ -82,7 +85,7 @@ export default function SignUp() {
                 required
                 value={form.username}
                 onChange={e => setForm({ ...form, username: e.target.value })}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none"
                 placeholder="janedoe123"
               />
             </div>
@@ -94,7 +97,7 @@ export default function SignUp() {
             required
             value={form.email}
             onChange={e => setForm({ ...form, email: e.target.value })}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white placeholder-slate-600 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none"
             placeholder="jane@example.com"
           />
 
@@ -104,7 +107,7 @@ export default function SignUp() {
               <select
                 value={form.domainType}
                 onChange={e => setForm({ ...form, domainType: e.target.value })}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none outline-none"
               >
                 {DOMAINS.map(d => <option key={d.value} value={d.value} className="bg-slate-900">{d.label}</option>)}
               </select>
@@ -114,34 +117,36 @@ export default function SignUp() {
               <select
                 value={form.role}
                 onChange={e => setForm({ ...form, role: e.target.value as RoleEnum })}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none outline-none"
               >
                 {ROLES.map(r => <option key={r.value} value={r.value} className="bg-slate-900">{r.label}</option>)}
               </select>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Password</label>
-              <input
-                type="password"
-                required
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-widest text-slate-400">Confirm</label>
-              <input
-                type="password"
-                required
-                value={form.confirmPassword}
-                onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 p-3 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
-              />
-            </div>
+          {/* THE INJECTION: Advanced Password Fields */}
+          <div className="grid grid-cols-1 gap-6 mt-6 pt-6 border-t border-white/10">
+            <PasswordField
+              label="Master Password"
+              name="password"
+              required
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
+              showChecklist={true}
+              allowGenerate={true}
+              placeholder="Initialize secure key..."
+            />
+            
+            <PasswordField
+              label="Verify Key"
+              name="confirmPassword"
+              required
+              value={form.confirmPassword || ''}
+              onChange={e => setForm({ ...form, confirmPassword: e.target.value })}
+              showChecklist={false}
+              allowGenerate={false}
+              placeholder="Confirm secure key..."
+            />
           </div>
 
           {error && <p className="mt-6 text-sm font-bold text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">{error}</p>}

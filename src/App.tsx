@@ -2,8 +2,8 @@ import { Routes, Route, Outlet, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
-import GeometricBackgroundLayout from './components/GeometricBackground'; // The new wrapper
-
+import GeometricBackgroundLayout from './components/GeometricBackground'; // Make sure this path is correct
+import Dashboard from './pages/Dashboard';
 import Homepage from './pages/Homepage';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/Signup';
@@ -17,6 +17,11 @@ import MyCompanyEdit from './pages/MyCompanyEdit';
 import ExploreCompanies from './pages/ExploreCompanies';
 import CompanyProfileView from './pages/CompanyProfileView';
 import Settings from './pages/Settings';
+import Premium from './pages/Premium'; // THE FIX: Imported the new page
+import Chat from './pages/Chat';
+
+// Inside Routes:
+
 
 export default function App() {
   const location = useLocation();
@@ -25,6 +30,8 @@ export default function App() {
   // We store the routes in a single variable so React Router doesn't get confused
   const pageRoutes = (
     <Routes>
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
       <Route path="/" element={<Homepage />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
@@ -40,6 +47,9 @@ export default function App() {
       <Route path="/explore-companies" element={<ExploreCompanies />} />
       <Route path="/company_profile/:id" element={<CompanyProfileView />} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      
+      {/* THE FIX: Injected the Premium route here */}
+      <Route path="/premium" element={<Premium />} />
     </Routes>
   );
 

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { memo, useCallback, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { animate } from "motion/react";
+import { animate } from "framer-motion"; // Changed from motion/react to framer-motion
 
 interface GlowingEffectProps {
   blur?: number;
@@ -80,10 +80,7 @@ const GlowingEffect = memo(
           const currentAngle =
             parseFloat(element.style.getPropertyValue("--start")) || 0;
           let targetAngle =
-            (180 *
-              Math.atan2(mouseY - center[1], mouseX - center[0])) /
-              Math.PI +
-            90;
+            (180 * Math.atan2(mouseY - center[1], mouseX - center[0])) / Math.PI + 90;
 
           const angleDiff = ((targetAngle - currentAngle + 180) % 360) - 180;
           const newAngle = currentAngle + angleDiff;
@@ -147,17 +144,17 @@ const GlowingEffect = memo(
                   var(--black),
                   var(--black) calc(25% / var(--repeating-conic-gradient-times))
                 )`
-                  : `radial-gradient(circle, #dd7bbb 10%, #dd7bbb00 20%),
-                radial-gradient(circle at 40% 40%, #d79f1e 5%, #d79f1e00 15%),
-                radial-gradient(circle at 60% 60%, #5a922c 10%, #5a922c00 20%), 
-                radial-gradient(circle at 40% 60%, #4c7894 10%, #4c789400 20%),
+                  : `radial-gradient(circle, #3b82f6 10%, #3b82f600 20%),
+                radial-gradient(circle at 40% 40%, #10b981 5%, #10b98100 15%),
+                radial-gradient(circle at 60% 60%, #06b6d4 10%, #06b6d400 20%), 
+                radial-gradient(circle at 40% 60%, #3b82f6 10%, #3b82f600 20%),
                 repeating-conic-gradient(
                   from 236.84deg at 50% 50%,
-                  #dd7bbb 0%,
-                  #d79f1e calc(25% / var(--repeating-conic-gradient-times)),
-                  #5a922c calc(50% / var(--repeating-conic-gradient-times)), 
-                  #4c7894 calc(75% / var(--repeating-conic-gradient-times)),
-                  #dd7bbb calc(100% / var(--repeating-conic-gradient-times))
+                  #3b82f6 0%,
+                  #10b981 calc(25% / var(--repeating-conic-gradient-times)),
+                  #06b6d4 calc(50% / var(--repeating-conic-gradient-times)), 
+                  #3b82f6 calc(75% / var(--repeating-conic-gradient-times)),
+                  #10b981 calc(100% / var(--repeating-conic-gradient-times))
                 )`,
             } as React.CSSProperties
           }
@@ -191,4 +188,3 @@ const GlowingEffect = memo(
 GlowingEffect.displayName = "GlowingEffect";
 
 export { GlowingEffect };
-

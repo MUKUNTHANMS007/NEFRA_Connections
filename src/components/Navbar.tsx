@@ -1,11 +1,16 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Network, Bell, Home, Search, User, Newspaper, SquarePlus, Building2, LogIn, UserPlus, LogOut } from 'lucide-react';
+import { 
+  Network, Bell, Home, Search, User, Newspaper, 
+  SquarePlus, Building2, LogIn, UserPlus, LogOut, Zap,
+  MessageSquare // NEW: Chat Icon
+} from 'lucide-react';
 import api from '../api';
 import { cn } from '@/lib/utils';
+import { LayoutDashboard } from 'lucide-react';
 
-// --- Framer Motion Configuration (from 21st.dev ExpandableTabs) ---
+// --- Framer Motion Configuration ---
 const buttonVariants = {
   initial: { gap: 0, paddingLeft: ".5rem", paddingRight: ".5rem" },
   animate: (isSelected: boolean) => ({
@@ -61,13 +66,16 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // UPDATED: Added Chat to the tabs array
   const tabs = [
     { label: 'Home', to: '/', icon: Home },
     { label: 'Search', to: '/search', icon: Search },
-    { label: 'Profile', to: '/profile', icon: User },
+    { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+    { label: 'Chat', to: '/chat', icon: MessageSquare }, // THE INJECTION
     { label: 'Feed', to: '/feed', icon: Newspaper },
     { label: 'Post', to: '/post', icon: SquarePlus },
     { label: 'Explore', to: '/explore-companies', icon: Building2 },
+    { label: 'Profile', to: '/profile', icon: User },
   ] as const;
 
   const authTabs = [
@@ -86,7 +94,7 @@ export default function Navbar() {
       await api.put(`/notifications/${notification.id}/read`);
       setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
     } catch {
-      // ignore errors for now; keep UI responsive
+      // ignore errors
     }
   };
 
@@ -100,12 +108,20 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top Left Brand Logo */}
+      {/* Top Left Brand Logo & Pricing Link */}
       <div className="pointer-events-none fixed top-4 left-1/2 z-40 w-full max-w-7xl -translate-x-1/2 px-4 sm:px-6 lg:px-8">
-        <div className="pointer-events-auto flex items-center justify-start">
+        <div className="pointer-events-auto flex items-center gap-3 justify-start">
           <Link to="/" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/40 px-3 py-2 text-slate-100 shadow-sm backdrop-blur-md hover:bg-slate-900/60 transition-colors">
             <Network className="h-5 w-5 text-blue-500" />
-            <span className="text-sm font-bold tracking-tight">NEFRA</span>
+            <span className="text-sm font-bold tracking-tight text-white">NEFRA</span>
+          </Link>
+
+          <Link 
+            to="/premium" 
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)] backdrop-blur-md hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-all"
+          >
+            <Zap className="h-3 w-3 fill-emerald-400/20" />
+            Upgrade
           </Link>
         </div>
       </div>
@@ -117,7 +133,6 @@ export default function Navbar() {
             'flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/80 p-1.5 shadow-2xl backdrop-blur-xl',
           )}
         >
-          {/* Main Navigation Tabs */}
           {(userId ? tabs : authTabs).map((t, idx) => {
             const Icon = t.icon;
             const isActive = idx === activeIndex;
@@ -157,10 +172,8 @@ export default function Navbar() {
             );
           })}
 
-          {/* Separator Line */}
           {userId && <div className="mx-1 h-[24px] w-[1px] bg-white/10" aria-hidden="true" />}
 
-          {/* Notification Bell */}
           {userId && (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -176,7 +189,6 @@ export default function Navbar() {
                 )}
               </button>
 
-              {/* Notification Dropdown */}
               {notifOpen && (
                 <div className="absolute bottom-full right-0 z-50 mb-4 w-80 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-xl">
                   <div className="max-h-72 overflow-y-auto p-2">
@@ -206,7 +218,6 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* Logout Button */}
           {userId && (
             <button
               type="button"
