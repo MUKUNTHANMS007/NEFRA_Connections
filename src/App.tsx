@@ -19,7 +19,7 @@ import CompanyProfileView from './pages/CompanyProfileView';
 import Settings from './pages/Settings';
 import Premium from './pages/Premium'; // THE FIX: Imported the new page
 import Chat from './pages/Chat';
-
+import AIChat from './pages/AIChat';
 // Inside Routes:
 
 
@@ -33,6 +33,7 @@ export default function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
       <Route path="/" element={<Homepage />} />
+      <Route path="/ai-chat" element={<AIChat />} />
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<Navigate to="/signin" replace />} />

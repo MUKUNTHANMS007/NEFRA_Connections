@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Network, Bell, Home, Search, User, Newspaper, 
   SquarePlus, Building2, LogIn, UserPlus, LogOut, Zap,
-  MessageSquare // NEW: Chat Icon
+  MessageSquare, Bot 
 } from 'lucide-react';
 import api from '../api';
 import { cn } from '@/lib/utils';
@@ -66,12 +66,13 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // UPDATED: Added Chat to the tabs array
+  // THE INJECTION: AI Core added here
   const tabs = [
     { label: 'Home', to: '/', icon: Home },
     { label: 'Search', to: '/search', icon: Search },
     { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-    { label: 'Chat', to: '/chat', icon: MessageSquare }, // THE INJECTION
+    { label: 'Chat', to: '/chat', icon: MessageSquare },
+    { label: 'AI Core', to: '/ai-chat', icon: Bot }, 
     { label: 'Feed', to: '/feed', icon: Newspaper },
     { label: 'Post', to: '/post', icon: SquarePlus },
     { label: 'Explore', to: '/explore-companies', icon: Building2 },

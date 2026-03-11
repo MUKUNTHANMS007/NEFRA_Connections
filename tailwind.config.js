@@ -78,6 +78,7 @@ export default {
   plugins: [
     require("tailwindcss-animate"),
     addVariablesForColors, // <-- The crucial Aceternity plugin
+    require('@tailwindcss/typography'),
   ],
 }
 
