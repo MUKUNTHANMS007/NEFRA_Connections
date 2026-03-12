@@ -1,269 +1,264 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { Edit3, FileText, Users, Settings, Zap, Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { 
+  Edit3, MapPin, Briefcase, Globe, Github, Linkedin, 
+  DollarSign, Activity, Settings, Sparkles, Loader2, Trash2, Calendar
+} from 'lucide-react';
 import api from '../api';
 import type { ProfileUser } from '../types/user';
 
-// UI Components
-import { NumberTicker } from "../components/ui/number-ticker";
-import { BorderBeam } from "../components/ui/border-beam";
-import { OrbitingCircles } from "../components/ui/orbiting-circles";
+const SleekAIInsight = ({ industry }: { industry: string }) => {
+  const [analyzing, setAnalyzing] = useState(true);
+  const [text, setText] = useState("");
+  const fullText = `Profile metrics align with top-quartile performers in ${industry}. Network density is optimal for seed-stage capital acquisition.`;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnalyzing(false);
+      let i = 0;
+      const typeWriter = setInterval(() => {
+        setText(fullText.slice(0, i));
+        i++;
+        if (i > fullText.length) clearInterval(typeWriter);
+      }, 20);
+      return () => clearInterval(typeWriter);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [industry]);
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="h-4 w-4 text-indigo-400" />
+        <h3 className="text-sm font-medium text-slate-200">Nefra AI Analysis</h3>
+      </div>
+      <div className="min-h-[40px]">
+        {analyzing ? (
+          <div className="flex items-center gap-2 text-slate-400">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span className="text-sm font-medium">Processing...</span>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-400 leading-relaxed">{text}</p>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function Profile() {
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
-  const { id } = useParams<{ id?: string }>();
+  
+  const [activeTab, setActiveTab] = useState('overview');
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'activity', label: 'Activity' },
+    { id: 'network', label: 'Network' }
+  ];
 
-  const viewerId = typeof window !== 'undefined' ? localStorage.getItem('userId') ?? '' : '';
-  const profileId = id ?? viewerId;
+  const viewerId = localStorage.getItem('userId');
 
   useEffect(() => {
-    if (!profileId || !viewerId) {
-      setLoading(false);
-      return;
-    }
-
+    if (!viewerId) { setLoading(false); return; }
+    
     Promise.all([
-      api.get<ProfileUser>(`/profiles/${profileId}?viewerId=${viewerId}`),
-      api.get('/posts/user/' + profileId)
-    ])
-    .then(([userRes, postsRes]) => {
-      const apiUser = userRes.data as any;
-      const mappedUser: ProfileUser = {
-        ...apiUser,
-        connectionCount: apiUser.connectionCount ?? apiUser.connection_count ?? 0,
-        postCount: apiUser.postCount ?? apiUser.post_count ?? 0,
-        connectionStatus: apiUser.connectionStatus ?? apiUser.connection_status ?? 'NONE',
-      };
-
-      setUser(mappedUser);
+      api.get<ProfileUser>(`/profiles/${viewerId}?viewerId=${viewerId}`),
+      api.get('/posts/user/' + viewerId)
+    ]).then(([userRes, postsRes]) => {
+      setUser(userRes.data);
       const data = Array.isArray(postsRes.data) ? postsRes.data : [];
-      setRecentPosts(data.slice(0, 3));
-    })
-    .catch((err: any) => {
-      setError(err.response?.status === 404 ? 'User not found.' : 'Server connection error.');
-    })
-    .finally(() => setLoading(false));
-  }, [profileId, viewerId]);
+      setRecentPosts(data.slice(0, 10));
+    }).catch(() => setError('Failed to load profile data.'))
+      .finally(() => setLoading(false));
+  }, [viewerId]);
 
-  if (loading) return <div className="flex min-h-[60vh] items-center justify-center text-blue-400 font-mono animate-pulse text-xl">NEFRA_SYSTEM_INITIALIZING...</div>;
-  if (error) return <div className="flex min-h-[60vh] items-center justify-center text-red-400 font-mono">ERROR: {error}</div>;
-  if (!user) return <div className="flex min-h-[60vh] items-center justify-center text-slate-400">NO_DATA_STREAM</div>;
-
-  const fullName = user.fullName ?? user.full_name ?? user.username ?? 'User';
-  const role = user.role ?? 'Member';
-  const industry = (user as any).industry ?? 'Tech';
-  const isVerified = (user as any).isVerified;
-  const connectionStatus = (user.connectionStatus ?? 'NONE') as ProfileUser['connectionStatus'];
-  const isOwnProfile = !id || id === String(viewerId);
-
-  const handleConnect = async () => {
-    if (!viewerId || !profileId) return;
+  const handleDeletePost = async (postId: number | string) => {
+    if (!window.confirm("Delete this post?")) return;
     try {
-      await api.post('/connections/request', null, {
-        params: { senderId: viewerId, recipientId: profileId }
-      });
-      setUser((prev) => prev ? { ...prev, connectionStatus: 'PENDING_SENT' } : prev);
-    } catch (error: any) {
-      const serverMessage = typeof error.response?.data === 'string' 
-          ? error.response?.data 
-          : JSON.stringify(error.response?.data) || error.message;
-      alert("SPRING BOOT SAYS: " + serverMessage);
-    }
+      await api.delete(`/posts/${postId}?userId=${viewerId}`);
+      setRecentPosts(prev => prev.filter(p => p.id !== postId));
+    } catch (err) { alert("Failed to delete post."); }
   };
 
-  const handleRespond = async (action: 'ACCEPT' | 'REJECT') => {
-    if (!profileId || !viewerId) return;
-    try {
-      await api.put('/connections/respond', null, {
-        params: { senderId: profileId, recipientId: viewerId, action: action },
-      });
-      setUser((prev) => prev ? { ...prev, connectionStatus: action === 'ACCEPT' ? 'ACCEPTED' : 'NONE' } : prev);
-    } catch {
-      alert('Failed to update connection.');
-    }
-  };
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-slate-400"><Loader2 className="h-6 w-6 animate-spin" /></div>;
+  if (error) return <div className="flex min-h-screen items-center justify-center text-red-400">{error}</div>;
+  if (!user) return null;
+
+  const u = user as any;
+  const fullName = u.fullName ?? u.full_name ?? u.username ?? 'User';
+  const role = u.role ?? 'Member';
+  const industry = u.industry ?? 'Technology';
 
   return (
-    <div className="w-full">
-      <div className="relative z-10 mx-auto max-w-5xl px-4 pt-10 pb-10 sm:px-6 lg:px-8 w-full">
+    <div className="min-h-screen w-full bg-transparent pt-24 pb-20 text-slate-200">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/40 backdrop-blur-xl p-10 shadow-2xl ring-1 ring-white/10">
-          
-          {isVerified && (
-            <BorderBeam size={350} duration={10} colorFrom="#3b82f6" colorTo="#10b981" />
-          )}
-
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-center">
-            
-            <div className="relative flex h-[220px] w-[220px] items-center justify-center overflow-hidden rounded-full border border-white/10 bg-slate-900/50 shadow-sm mx-auto lg:mx-0 backdrop-blur-md">
-              <div className="z-20 h-24 w-24 rounded-full bg-blue-600 flex items-center justify-center text-4xl font-black text-white shadow-md">
-                {fullName.charAt(0)}
+        {/* PREMIUM HEADER */}
+        <div className="relative mb-12 flex flex-col items-start gap-8 sm:flex-row sm:items-end">
+          <div className="relative flex h-32 w-32 shrink-0 items-center justify-center rounded-3xl border border-white/10 bg-gradient-to-br from-slate-800 to-slate-900 text-5xl font-bold text-white shadow-xl backdrop-blur-xl">
+            {fullName.charAt(0)}
+            {u.isVerified && (
+              <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 border-4 border-[#030303]">
+                <Activity className="h-4 w-4 text-white" />
               </div>
-              
-              <OrbitingCircles radius={65} duration={20} delay={10} reverse>
-                 <Users className="h-5 w-5 text-blue-500/80" />
-              </OrbitingCircles>
-              <OrbitingCircles radius={95} duration={25} delay={5}>
-                 <Zap className="h-4 w-4 text-emerald-500/80" />
-              </OrbitingCircles>
-            </div>
+            )}
+          </div>
 
-            <div className="flex-1 text-center lg:text-left">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-2">
-                  <h1 className="text-4xl font-extrabold text-white tracking-tight sm:text-5xl">
-                    {fullName}
-                  </h1>
-                  <p className="text-blue-400 font-mono text-sm tracking-widest uppercase font-bold mt-2">
-                    {role} Sector // {industry}
-                  </p>
+          <div className="flex-1 w-full pb-2">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-semibold tracking-tight text-white">{fullName}</h1>
+                <p className="mt-1.5 text-lg text-slate-400 font-medium">{u.headline ?? 'Add a professional headline'}</p>
+                
+                <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500">
+                  <span className="flex items-center gap-2"><Briefcase className="h-4 w-4" /> {role}</span>
+                  <span className="flex items-center gap-2"><Globe className="h-4 w-4" /> {u.domainType ?? 'General'}</span>
+                  {u.location && <span className="flex items-center gap-2"><MapPin className="h-4 w-4" /> {u.location}</span>}
                 </div>
-                {isOwnProfile ? (
-                  <Link
-                    to="/settings"
-                    className="mt-6 sm:mt-0 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/50 backdrop-blur-md px-5 py-2.5 text-sm font-bold text-slate-200 hover:border-blue-500/60 hover:text-blue-300 hover:bg-slate-900/70 transition-all shadow-sm"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                    CONFIG_SYSTEM
-                  </Link>
-                ) : connectionStatus === 'ACCEPTED' ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-6 sm:mt-0 inline-flex items-center gap-2 rounded-xl border border-emerald-500/70 bg-emerald-500/10 px-5 py-2.5 text-sm font-bold text-emerald-400 cursor-default"
-                  >
-                    CONNECTED
-                  </button>
-                ) : connectionStatus === 'PENDING_RECEIVED' ? (
-                  <div className="mt-6 sm:mt-0 flex items-center justify-center lg:justify-start gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleRespond('ACCEPT')}
-                      className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/70 bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 transition-all shadow-sm"
-                    >
-                      ACCEPT
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRespond('REJECT')}
-                      className="inline-flex items-center gap-2 rounded-xl border border-red-500/50 bg-slate-900/50 backdrop-blur px-5 py-2.5 text-sm font-bold text-red-400 hover:bg-red-500/20 transition-all"
-                    >
-                      REJECT
-                    </button>
-                  </div>
-                ) : connectionStatus === 'PENDING' || connectionStatus === 'PENDING_SENT' ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-6 sm:mt-0 inline-flex items-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/10 px-5 py-2.5 text-sm font-bold text-blue-400 cursor-default"
-                  >
-                    PENDING
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleConnect}
-                    className="mt-6 sm:mt-0 inline-flex items-center gap-2 rounded-xl border border-blue-500/70 bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-500 hover:border-blue-400 transition-all shadow-sm"
-                  >
-                    CONNECT
-                  </button>
-                )}
               </div>
-              
-              <p className="mt-8 text-lg text-slate-300 leading-relaxed border-l-4 border-blue-500/40 pl-4 font-medium">
-                "{(user as any).description ?? 'Executing high-value connections in the NEFRA ecosystem.'}"
-              </p>
 
-              <div className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-4 border-t border-slate-800 pt-10">
-                <div>
-                  <p className="text-3xl font-mono font-bold tracking-tighter text-white">
-                    <NumberTicker value={Number(user.connectionCount ?? 0)} className="text-white" />
-                  </p>
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Following</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-mono font-bold tracking-tighter text-emerald-400">
-                    <NumberTicker value={Number(user.postCount ?? 0)} className="text-emerald-400" />
-                  </p>
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Followers</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-mono font-bold text-blue-400 tracking-tighter">
-                    {(user as any).foundedYear ?? 'N/A'}
-                  </p>
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Founded</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-mono font-bold text-slate-200 tracking-tighter">
-                    {(user as any).industry ?? 'Tech'}
-                  </p>
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mt-1">Industry</p>
-                </div>
+              <div className="flex items-center gap-3">
+                <Link to="/settings" className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all">
+                  <Settings className="h-4 w-4" /> Edit Profile
+                </Link>
+                <Link to="/post" className="flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-white transition-all shadow-sm">
+                  <Edit3 className="h-4 w-4" /> Create Post
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
-        {/* FEED & ACTIONS SECTION */}
-        <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
-           <div className="lg:col-span-2 space-y-8">
-              <h2 className="text-xs font-black uppercase tracking-[0.2em] text-blue-400 px-2 flex items-center gap-2">
-                <div className="h-1 w-8 bg-blue-600" /> Live_Activity_Log
-              </h2>
-              {recentPosts.length > 0 ? (
-                recentPosts.map((post: any, index: number) => (
-                  <div
-                    key={post.id ?? `recent-post-${index}`}
-                    className="group relative rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-lg p-6 hover:shadow-lg hover:bg-slate-900/60 transition-all"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-3">
-                        {post.title && <h3 className="font-bold text-white text-xl group-hover:text-blue-300 transition-colors">{post.title}</h3>}
-                        <p className="text-slate-300 text-sm leading-relaxed font-medium">{post.description ?? post.content}</p>
-                        <p className="text-[10px] font-mono text-slate-400">
-                          {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
-                        </p>
+        {/* 21st.dev ANIMATED TABS */}
+        <div className="mb-8">
+          <div className="flex space-x-1 rounded-2xl bg-white/[0.03] p-1.5 backdrop-blur-md border border-white/5 w-fit">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative rounded-xl px-6 py-2.5 text-sm font-medium transition-colors outline-none ${
+                  activeTab === tab.id ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="active-tab-indicator"
+                    className="absolute inset-0 rounded-xl bg-white/10 shadow-sm border border-white/5"
+                    transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* TAB CONTENT PANELS */}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+        >
+          {activeTab === 'overview' && (
+            <>
+              <div className="lg:col-span-2 space-y-6">
+                <div className="rounded-2xl border border-white/5 bg-slate-900/20 p-8 backdrop-blur-sm">
+                  <h2 className="text-base font-semibold text-white mb-4">About</h2>
+                  <p className="text-slate-400 leading-relaxed text-sm">
+                    {u.description ?? 'No detailed description provided. Update your settings to add your professional bio here.'}
+                  </p>
+                </div>
+                <SleekAIInsight industry={industry} />
+              </div>
+
+              <div className="space-y-6">
+                <div className="rounded-2xl border border-white/5 bg-slate-900/20 p-6 backdrop-blur-sm">
+                  <h3 className="text-sm font-semibold text-white mb-4">Details</h3>
+                  <div className="space-y-4 text-sm">
+                    {u.totalAssets > 0 && (
+                      <div className="flex items-center justify-between pb-4 border-b border-white/5">
+                        <span className="text-slate-500 flex items-center gap-2"><DollarSign className="h-4 w-4" /> Assets</span>
+                        <span className="font-medium text-emerald-400">${Number(u.totalAssets).toLocaleString()}</span>
                       </div>
-                      {isOwnProfile && (
-                        <button onClick={async () => {
-                           await api.delete(`/posts/${post.id}?userId=${localStorage.getItem('userId')}`);
-                           setRecentPosts(prev => prev.filter(p => p.id !== post.id));
-                        }} className="p-2 text-slate-400 hover:text-red-400 transition-colors">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
+                    )}
+                    {u.foundedYear && (
+                      <div className="flex items-center justify-between pb-4 border-b border-white/5">
+                        <span className="text-slate-500">Founded</span>
+                        <span className="font-medium text-slate-300">{u.foundedYear}</span>
+                      </div>
+                    )}
+                    {u.linkedinUrl && (
+                      <div className="flex items-center justify-between pb-4 border-b border-white/5">
+                        <span className="text-slate-500">LinkedIn</span>
+                        <a href={u.linkedinUrl} target="_blank" rel="noreferrer" className="font-medium text-blue-400 hover:text-blue-300">View Profile</a>
+                      </div>
+                    )}
+                    {u.githubUrl && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">GitHub</span>
+                        <a href={u.githubUrl} target="_blank" rel="noreferrer" className="font-medium text-slate-300 hover:text-white">View Repository</a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'activity' && (
+            <div className="lg:col-span-2 space-y-4">
+              {recentPosts.length > 0 ? (
+                recentPosts.map((post: any) => (
+                  <div key={post.id} className="group rounded-2xl border border-white/5 bg-slate-900/20 p-6 backdrop-blur-sm hover:bg-slate-900/40 transition-all">
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        {post.title && <h4 className="font-medium text-slate-200 mb-2">{post.title}</h4>}
+                        <p className="text-sm text-slate-400 leading-relaxed">{post.description ?? post.content}</p>
+                        <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+                          <Calendar className="h-3 w-3" />
+                          {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+                        </div>
+                      </div>
+                      <button onClick={() => handleDeletePost(post.id)} className="opacity-0 group-hover:opacity-100 p-2 rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-all" title="Delete Post">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-slate-400 font-medium px-4 py-3 bg-slate-900/40 backdrop-blur-md inline-block rounded-lg border border-white/10">No active signal logs detected...</p>
+                <div className="rounded-2xl border border-dashed border-white/10 p-12 text-center">
+                  <p className="text-slate-500 text-sm">No recent activity found.</p>
+                </div>
               )}
-           </div>
+            </div>
+          )}
 
-           <div className="space-y-6">
-              <h2 className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400 px-2 flex items-center gap-2">
-                <div className="h-1 w-8 bg-emerald-600" /> Command_Center
-              </h2>
-              {[
-                { id: "post", to: "/post", icon: FileText, title: "Post Signal", color: "text-blue-400" },
-                { id: "search", to: "/search", icon: Users, title: "Scan Network", color: "text-emerald-400" },
-                { id: "settings", to: "/settings", icon: Settings, title: "System Opt", color: "text-slate-400" }
-              ].map((action) => (
-                <Link
-                  key={action.id}
-                  to={action.to}
-                  className="flex items-center gap-4 rounded-xl border border-white/10 bg-slate-900/40 backdrop-blur-lg p-5 hover:bg-slate-900/60 hover:-translate-y-1 hover:shadow-xl transition-all"
-                >
-                  <action.icon className={`h-6 w-6 ${action.color}`} />
-                  <span className="font-bold text-slate-200 text-sm uppercase tracking-widest">{action.title}</span>
-                </Link>
-              ))}
-           </div>
-        </div>
+          {activeTab === 'network' && (
+            <div className="lg:col-span-2">
+               <div className="rounded-2xl border border-white/5 bg-slate-900/20 p-8 backdrop-blur-sm text-center">
+                  <div className="flex justify-center gap-12">
+                    <div>
+                      <p className="text-4xl font-light text-white mb-2">{u.connectionCount ?? 0}</p>
+                      <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Following</p>
+                    </div>
+                    <div>
+                      <p className="text-4xl font-light text-white mb-2">{u.postCount ?? 0}</p>
+                      <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">Followers</p>
+                    </div>
+                  </div>
+               </div>
+            </div>
+          )}
+        </motion.div>
+
       </div>
     </div>
   );

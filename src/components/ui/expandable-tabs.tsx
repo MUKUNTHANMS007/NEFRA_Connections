@@ -57,7 +57,7 @@ export function ExpandableTabs({
   const [selected, setSelected] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef(null);
 
-  useOnClickOutside(outsideClickRef, () => {
+  useOnClickOutside(outsideClickRef as unknown as React.RefObject<HTMLElement>, () => {
     setSelected(null);
     onChange?.(null);
   });
@@ -93,7 +93,7 @@ export function ExpandableTabs({
             animate="animate"
             custom={selected === index}
             onClick={() => handleSelect(index)}
-            transition={transition}
+            transition={transition as any}
             className={cn(
               "relative flex items-center rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-300",
               selected === index
@@ -109,7 +109,7 @@ export function ExpandableTabs({
                   initial="initial"
                   animate="animate"
                   exit="exit"
-                  transition={transition}
+                  transition={transition as any}
                   className="overflow-hidden"
                 >
                   {tab.title}

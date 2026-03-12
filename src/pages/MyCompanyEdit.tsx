@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, ArrowLeft, Save } from 'lucide-react';
+import { Building2, ArrowLeft, Save, Loader2, Target, Globe, DollarSign, AlignLeft, Briefcase } from 'lucide-react';
+import { motion } from 'framer-motion';
 import api from '../api';
 
-const DOMAIN_OPTIONS: { value: string; label: string }[] = [
+const DOMAIN_OPTIONS = [
   { value: 'TECHNICAL', label: 'Technical' },
   { value: 'FINANCIAL', label: 'Financial' },
   { value: 'EDUCATIONAL', label: 'Educational' },
@@ -12,218 +13,166 @@ const DOMAIN_OPTIONS: { value: string; label: string }[] = [
   { value: 'OTHER', label: 'Other' },
 ];
 
-const FUNDING_OPTIONS = ['Seed', 'Series A', 'Series B', 'Bootstrapped'];
+const FUNDING_OPTIONS = ['Bootstrapped', 'Pre-Seed', 'Seed', 'Series A', 'Series B', 'Series C+'];
+const SIZE_OPTIONS = ['1-10', '11-50', '51-200', '201-500', '500+'];
+
+// High-fidelity input component
+const InputField = ({ label, value, onChange, type = "text", placeholder = "", required = false }: any) => (
+  <div>
+    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+      {label} {required && <span className="text-indigo-500">*</span>}
+    </label>
+    <input
+      type={type}
+      value={value || ''}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      required={required}
+      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 placeholder-slate-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all"
+    />
+  </div>
+);
 
 export default function MyCompanyEdit() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
   const [form, setForm] = useState({
+    id: null as number | null,
     name: '',
     tagline: '',
     description: '',
+    solution: '',
     domainType: 'TECHNICAL',
+    industry: '',
     location: '',
     website: '',
-    fundingStage: 'Seed',
+    size: '1-10',
+    fundingStage: 'Bootstrapped',
+    foundedYear: '',
+    totalAssets: 0,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) { navigate('/signin'); return; }
+
+    api.get(`/companies/my-company?userId=${userId}`)
+      .then((res) => {
+        if (res.data && res.data.id) setForm((f) => ({ ...f, ...res.data }));
+      })
+      .catch(() => console.log("Initializing new company environment."))
+      .finally(() => setLoading(false));
+  }, [navigate]);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    const entrepreneurId = localStorage.getItem('userId');
-    
-    if (!entrepreneurId) {
-      setError('Please sign in to add a company.');
-      return;
-    }
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
 
-    setLoading(true);
+    const payload = { 
+      ...form, 
+      totalAssets: Number(form.totalAssets),
+      userId: userId // Backend needs this to link the company to you
+    };
+
     try {
-      // THE FIX 1: Rename 'website' to 'websiteUrl' to match the Java Entity
-      const payload = {
-        name: form.name,
-        tagline: form.tagline,
-        description: form.description,
-        domainType: form.domainType,
-        location: form.location,
-        websiteUrl: form.website, // Renamed here
-        fundingStage: form.fundingStage,
-      };
-
-      // THE FIX 2: Move entrepreneurId to the URL as a query parameter (?entrepreneurId=X)
-      await api.post(`/companies?entrepreneurId=${entrepreneurId}`, payload);
-      
-      navigate('/my-company');
+      if (form.id) {
+        await api.put(`/companies/${form.id}?userId=${userId}`, payload);
+      } else {
+        const res = await api.post(`/companies`, payload);
+        setForm(f => ({ ...f, id: res.data.id }));
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => navigate(`/company_profile/${form.id || 'redirect'}`), 1000);
     } catch (err: any) {
-      console.error('Company create error:', err);
-      // The backend will tell us exactly what field failed if we check err.response
-      setError(err.response?.data?.message ?? 'Failed to save company profile.');
-    } finally {
-      setLoading(false);
+      setError("Failed to sync workspace. Ensure all required fields are valid.");
     }
   };
 
+  if (loading) return <div className="flex min-h-screen items-center justify-center bg-transparent"><Loader2 className="h-8 w-8 animate-spin text-slate-400" /></div>;
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-        <Link
-          to="/my-company"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to My Company
-        </Link>
+    <div className="min-h-screen w-full bg-transparent text-slate-200 pt-24 pb-32">
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        
+        <div className="mb-10">
+          <Link to="/company" className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-300 transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Link>
+          <h1 className="text-3xl font-bold tracking-tight text-white">
+            {form.id ? 'Edit Workspace' : 'Initialize Company'}
+          </h1>
+          <p className="mt-2 text-sm text-slate-400">Setup your venture's professional identity on NEFRA.</p>
+        </div>
 
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-8 py-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
-                <Building2 className="h-5 w-5 text-slate-600" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Company Profile</p>
-                <h1 className="text-xl font-semibold text-slate-900">Add Company Profile</h1>
-              </div>
+        <form onSubmit={handleSave} className="space-y-8">
+          
+          {/* Identity Section */}
+          <section className="rounded-3xl border border-white/5 bg-slate-900/20 p-8 backdrop-blur-md">
+            <div className="flex items-center gap-3 mb-6 border-b border-white/5 pb-4">
+              <Building2 className="h-5 w-5 text-indigo-400" />
+              <h2 className="text-lg font-semibold text-white">Identity</h2>
             </div>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField label="Company Name" value={form.name} onChange={(v:string)=>setForm({...form, name:v})} required placeholder="Acme Corp" />
+              <InputField label="Tagline" value={form.tagline} onChange={(v:string)=>setForm({...form, tagline:v})} placeholder="The future of..." />
+              <InputField label="Location" value={form.location} onChange={(v:string)=>setForm({...form, location:v})} placeholder="San Francisco, Remote" />
+              <InputField label="Website" value={form.website} onChange={(v:string)=>setForm({...form, website:v})} placeholder="https://..." />
+            </div>
+          </section>
 
-          <form onSubmit={handleSubmit} className="p-8">
+          {/* Details Section */}
+          <section className="rounded-3xl border border-white/5 bg-slate-900/20 p-8 backdrop-blur-md">
+            <div className="flex items-center gap-3 mb-6 border-b border-white/5 pb-4">
+              <AlignLeft className="h-5 w-5 text-emerald-400" />
+              <h2 className="text-lg font-semibold text-white">Operational Details</h2>
+            </div>
             <div className="space-y-6">
-              {/* Company Name */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-                  Company Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. TechVentures Inc."
-                  className="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
-                />
-              </div>
-
-              {/* Tagline */}
-              <div>
-                <label htmlFor="tagline" className="block text-sm font-medium text-slate-700">
-                  Tagline
-                </label>
-                <input
-                  id="tagline"
-                  type="text"
-                  value={form.tagline}
-                  onChange={(e) => setForm({ ...form, tagline: e.target.value })}
-                  placeholder="Short catchy phrase"
-                  className="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-slate-700">
-                  Description
-                </label>
+               <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Description</label>
                 <textarea
-                  id="description"
-                  rows={4}
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Your startup story, mission, and what you build..."
-                  className="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
+                  rows={4}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition-all"
+                  placeholder="What are you building?"
                 />
               </div>
-
-              {/* Domain Type */}
-              <div>
-                <label htmlFor="domainType" className="block text-sm font-medium text-slate-700">
-                  Domain Type
-                </label>
-                <select
-                  id="domainType"
-                  value={form.domainType}
-                  onChange={(e) => setForm({ ...form, domainType: e.target.value })}
-                  className="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 transition-colors focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
-                >
-                  {DOMAIN_OPTIONS.map((d) => (
-                    <option key={d.value} value={d.value}>{d.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Location */}
-              <div>
-                <label htmlFor="location" className="block text-sm font-medium text-slate-700">
-                  Location
-                </label>
-                <input
-                  id="location"
-                  type="text"
-                  value={form.location}
-                  onChange={(e) => setForm({ ...form, location: e.target.value })}
-                  placeholder="City, Country"
-                  className="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
-                />
-              </div>
-
-              {/* Website URL */}
-              <div>
-                <label htmlFor="website" className="block text-sm font-medium text-slate-700">
-                  Website URL
-                </label>
-                <input
-                  id="website"
-                  type="url"
-                  value={form.website}
-                  onChange={(e) => setForm({ ...form, website: e.target.value })}
-                  placeholder="https://example.com"
-                  className="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
-                />
-              </div>
-
-              {/* Funding Stage */}
-              <div>
-                <label htmlFor="fundingStage" className="block text-sm font-medium text-slate-700">
-                  Funding Stage
-                </label>
-                <select
-                  id="fundingStage"
-                  value={form.fundingStage}
-                  onChange={(e) => setForm({ ...form, fundingStage: e.target.value })}
-                  className="mt-1.5 block w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 transition-colors focus:border-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-400"
-                >
-                  {FUNDING_OPTIONS.map((f) => (
-                    <option key={f} value={f}>{f}</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Domain</label>
+                  <select
+                    value={form.domainType}
+                    onChange={(e) => setForm({ ...form, domainType: e.target.value })}
+                    className="w-full rounded-xl border border-white/10 bg-[#0d1117] px-4 py-3 text-sm text-slate-200 focus:border-indigo-500 focus:outline-none"
+                  >
+                    {DOMAIN_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                  </select>
+                </div>
+                <InputField label="Founded Year" value={form.foundedYear} onChange={(v:string)=>setForm({...form, foundedYear:v})} type="number" />
               </div>
             </div>
+          </section>
 
-            {error && (
-              <p className="mt-6 text-sm text-red-600">{error}</p>
-            )}
-
-            <div className="mt-8 flex items-center gap-4">
+          {/* Floating Action Bar */}
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4 z-50">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/80 px-6 py-4 backdrop-blur-xl shadow-2xl">
+              <p className="text-sm text-slate-400 hidden sm:block">All fields are synced to the secure registry.</p>
               <button
                 type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-700 disabled:opacity-50"
+                className={`inline-flex items-center gap-2 rounded-xl px-8 py-2.5 text-sm font-bold text-white transition-all ${saved ? 'bg-emerald-500' : 'bg-indigo-600 hover:bg-indigo-500'}`}
               >
                 <Save className="h-4 w-4" />
-                {loading ? 'Saving…' : 'Save Company Profile'}
+                {saved ? 'Saved!' : 'Save Company'}
               </button>
-              <Link
-                to="/my-company"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900"
-              >
-                Cancel
-              </Link>
             </div>
-          </form>
-        </div>
-      </div>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 }

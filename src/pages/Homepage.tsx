@@ -26,22 +26,27 @@ export default function Homepage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    // FIXED: Removed bg-slate-950 so the App.tsx geometric background shines through
+    <div className="min-h-screen text-slate-100 flex flex-col bg-transparent">
+      
       {/* 3D Ethereal Beams Hero Section */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-black">
+      {/* FIXED: Removed bg-black */}
+      <div className="relative overflow-hidden border-b border-white/10">
         <EtherealBeamsHero />
       </div>
 
       {/* Recent Connections / Live Activity */}
-      <section className="relative border-b border-white/10 bg-slate-950 px-4 py-20 sm:px-6 lg:px-8 z-10">
+      {/* FIXED: Removed bg-slate-950 */}
+      <section className="relative border-b border-white/10 px-4 py-20 sm:px-6 lg:px-8 z-10">
         <div className="absolute left-1/2 top-0 -translate-x-1/2 h-[500px] w-[1000px] bg-blue-900/10 blur-[120px] pointer-events-none" />
         
         <div className="relative z-10 mx-auto max-w-7xl">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-blue-400 flex items-center gap-2">
+              {/* FIXED: Changed <p> to <div> to fix invalid HTML DOM nesting */}
+              <div className="text-xs font-black uppercase tracking-[0.2em] text-blue-400 flex items-center gap-2">
                 <div className="h-1 w-8 bg-blue-600" /> Network_Status
-              </p>
+              </div>
               <h2 className="mt-4 text-3xl font-black text-white tracking-tight">Global Signal Feed</h2>
             </div>
             <Link to="/search" className="inline-flex items-center gap-2 text-sm font-bold text-blue-400 hover:text-blue-300 transition-colors">
@@ -82,13 +87,15 @@ export default function Homepage() {
       </section>
 
       {/* Success Stories */}
-      <section className="relative border-b border-white/10 bg-slate-950 px-4 py-24 sm:px-6 lg:px-8 overflow-hidden z-10">
+      {/* FIXED: Removed bg-slate-950 */}
+      <section className="relative border-b border-white/10 px-4 py-24 sm:px-6 lg:px-8 overflow-hidden z-10">
         <div className="absolute right-0 bottom-0 h-[600px] w-[600px] bg-emerald-900/10 blur-[120px] pointer-events-none" />
 
         <div className="relative z-10 mx-auto max-w-7xl">
-          <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400 flex items-center gap-2">
+          {/* FIXED: Changed <p> to <div> */}
+          <div className="text-xs font-black uppercase tracking-[0.2em] text-emerald-400 flex items-center gap-2">
             <div className="h-1 w-8 bg-emerald-600" /> Verified_Metrics
-          </p>
+          </div>
           <h2 className="mt-4 text-3xl font-black text-white tracking-tight">Real Connections. Real ROI.</h2>
           <p className="mt-4 text-lg text-slate-400 max-w-2xl font-medium">
             Discover how ecosystem members turned simple introductions into exponential growth, funding, and scale.
@@ -114,7 +121,8 @@ export default function Homepage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative px-4 py-32 sm:px-6 lg:px-8 bg-slate-950 overflow-hidden z-10">
+      {/* FIXED: Removed bg-slate-950 */}
+      <section className="relative px-4 py-32 sm:px-6 lg:px-8 overflow-hidden z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(37,99,235,0.15),transparent_50%)]" />
         
         <div className="relative z-10 mx-auto max-w-4xl rounded-[2.5rem] border border-blue-500/30 bg-slate-900/60 backdrop-blur-2xl p-12 md:p-20 text-center shadow-2xl shadow-blue-900/20">

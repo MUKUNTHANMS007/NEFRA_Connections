@@ -2,7 +2,8 @@ import { LogoCloud } from "@/components/logo-cloud-3";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-slate-950">
+    // THE FIX: bg-slate-950 is GONE. Replaced with bg-transparent and z-10.
+    <footer className="relative z-10 border-t border-white/10 bg-transparent">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="space-y-4">
           <h2 className="text-center font-medium text-lg text-slate-300 tracking-tight md:text-xl">
@@ -54,4 +55,3 @@ const logos = [
     alt: "Clerk Logo",
   },
 ];
-
